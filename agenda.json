@@ -46,7 +46,7 @@
     "exitCode": 0
   },
   "timing": {
-    "talkMinutes": 10,
+    "talkMinutes": 35,
     "qaMinutes": 7,
     "changeoverMinutes": 5
   },
@@ -65,18 +65,17 @@
       "role": "Host"
     },
     {
-      "start": "09:14",
-      "dur": 117,
+      "start": "10:12",
+      "dur": 35,
       "kind": "talk",
       "act": 1,
       "title": "Docs That Write Back",
       "who": "Aiko Brandt",
       "role": "Developer Experience",
-      "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong.",
-      "qa": 77
+      "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong."
     },
     {
-      "start": "11:16",
+      "start": "10:52",
       "dur": 32,
       "kind": "talk",
       "act": 1,
@@ -87,13 +86,13 @@
       "qa": 12
     },
     {
-      "start": "11:48",
+      "start": "11:24",
       "dur": 5,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "11:53",
+      "start": "11:29",
       "dur": 10,
       "kind": "talk",
       "act": 2,
@@ -104,7 +103,7 @@
       "qa": 5
     },
     {
-      "start": "12:18",
+      "start": "11:54",
       "dur": 32,
       "kind": "talk",
       "act": 2,
@@ -114,7 +113,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "12:55",
+      "start": "12:31",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -124,13 +123,13 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "13:37",
+      "start": "13:13",
       "dur": 40,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "14:17",
+      "start": "13:53",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
@@ -138,7 +137,7 @@
       "role": "Host"
     },
     {
-      "start": "14:27",
+      "start": "14:03",
       "dur": 57,
       "kind": "talk",
       "act": 2,
