@@ -66,17 +66,17 @@
     },
     {
       "start": "09:14",
-      "dur": 92,
+      "dur": 97,
       "kind": "talk",
       "act": 1,
       "title": "Docs That Write Back",
       "who": "Aiko Brandt",
       "role": "Developer Experience",
       "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong.",
-      "qa": 52
+      "qa": 57
     },
     {
-      "start": "10:51",
+      "start": "10:56",
       "dur": 42,
       "kind": "talk",
       "act": 1,
@@ -86,13 +86,13 @@
       "desc": "Where the milliseconds in a user request actually go, and the three changes that bought back half of them."
     },
     {
-      "start": "11:33",
+      "start": "11:38",
       "dur": 10,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "11:43",
+      "start": "11:48",
       "dur": 20,
       "kind": "talk",
       "act": 2,
@@ -103,7 +103,7 @@
       "qa": 5
     },
     {
-      "start": "12:18",
+      "start": "12:23",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -113,7 +113,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "13:05",
+      "start": "13:10",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -123,13 +123,13 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "13:47",
+      "start": "13:52",
       "dur": 50,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "14:37",
+      "start": "14:42",
       "dur": 42,
       "kind": "talk",
       "act": 3,
@@ -139,7 +139,7 @@
       "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
     },
     {
-      "start": "15:24",
+      "start": "15:29",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
