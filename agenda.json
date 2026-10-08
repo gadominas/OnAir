@@ -77,7 +77,7 @@
     },
     {
       "start": "10:56",
-      "dur": 42,
+      "dur": 37,
       "kind": "talk",
       "act": 1,
       "title": "The Latency Budget",
@@ -86,13 +86,13 @@
       "desc": "Where the milliseconds in a user request actually go, and the three changes that bought back half of them."
     },
     {
-      "start": "11:38",
-      "dur": 10,
+      "start": "11:33",
+      "dur": 5,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "11:48",
+      "start": "11:38",
       "dur": 20,
       "kind": "talk",
       "act": 2,
@@ -103,7 +103,7 @@
       "qa": 5
     },
     {
-      "start": "12:23",
+      "start": "12:13",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -113,7 +113,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "13:10",
+      "start": "13:00",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -123,13 +123,13 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "13:52",
+      "start": "13:42",
       "dur": 50,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "14:42",
+      "start": "14:32",
       "dur": 42,
       "kind": "talk",
       "act": 3,
@@ -139,7 +139,7 @@
       "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
     },
     {
-      "start": "15:29",
+      "start": "15:19",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
