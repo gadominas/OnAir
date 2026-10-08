@@ -66,17 +66,17 @@
     },
     {
       "start": "09:14",
-      "dur": 112,
+      "dur": 117,
       "kind": "talk",
       "act": 1,
       "title": "Docs That Write Back",
       "who": "Aiko Brandt",
       "role": "Developer Experience",
       "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong.",
-      "qa": 72
+      "qa": 77
     },
     {
-      "start": "11:11",
+      "start": "11:16",
       "dur": 42,
       "kind": "talk",
       "act": 1,
@@ -87,13 +87,13 @@
       "qa": 12
     },
     {
-      "start": "11:53",
+      "start": "11:58",
       "dur": 5,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "11:58",
+      "start": "12:03",
       "dur": 10,
       "kind": "talk",
       "act": 2,
@@ -104,7 +104,7 @@
       "qa": 5
     },
     {
-      "start": "12:23",
+      "start": "12:28",
       "dur": 32,
       "kind": "talk",
       "act": 2,
@@ -114,7 +114,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "13:00",
+      "start": "13:05",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -124,13 +124,13 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "13:42",
+      "start": "13:47",
       "dur": 40,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "14:22",
+      "start": "14:27",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
@@ -138,7 +138,7 @@
       "role": "Host"
     },
     {
-      "start": "14:32",
+      "start": "14:37",
       "dur": 57,
       "kind": "talk",
       "act": 2,
