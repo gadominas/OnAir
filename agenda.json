@@ -77,7 +77,7 @@
     },
     {
       "start": "11:16",
-      "dur": 42,
+      "dur": 32,
       "kind": "talk",
       "act": 1,
       "title": "The Latency Budget",
@@ -87,13 +87,13 @@
       "qa": 12
     },
     {
-      "start": "11:58",
+      "start": "11:48",
       "dur": 5,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "12:03",
+      "start": "11:53",
       "dur": 10,
       "kind": "talk",
       "act": 2,
@@ -104,7 +104,7 @@
       "qa": 5
     },
     {
-      "start": "12:28",
+      "start": "12:18",
       "dur": 32,
       "kind": "talk",
       "act": 2,
@@ -114,7 +114,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "13:05",
+      "start": "12:55",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -124,13 +124,13 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "13:47",
+      "start": "13:37",
       "dur": 40,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "14:27",
+      "start": "14:17",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
@@ -138,7 +138,7 @@
       "role": "Host"
     },
     {
-      "start": "14:37",
+      "start": "14:27",
       "dur": 57,
       "kind": "talk",
       "act": 2,
