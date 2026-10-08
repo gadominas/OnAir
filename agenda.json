@@ -1,12 +1,12 @@
 {
   "event": {
-    "name": "OnAir Demo Day 2027",
+    "name": "Demo",
     "brand": {
       "title": "OnAir",
       "number": "Demo"
     },
-    "city": "Lisbon",
-    "date": "2027-05-20",
+    "city": "Riga",
+    "date": "2026-10-08",
     "timeZone": "Europe/Lisbon",
     "utcOffset": "+01:00",
     "timeZoneNote": "Lisbon time (WEST, UTC+1)",
@@ -15,18 +15,25 @@
     "organizer": "Your Organisation"
   },
   "links": {
-    "qa": "",
-    "wall": "",
-    "stream": ""
+    "qa": "https://google.com",
+    "stream": "https://google.com",
+    "qr": "https://delfi.lt",
+    "wall": "https://delfi.lt"
   },
   "theme": {
-    "ink": "#0F0F46",
-    "navy": "#2A2A72",
-    "accent": "#3ACEA9",
-    "accentInk": "#0E7A5E"
+    "preset": "custom",
+    "source": "image",
+    "ink": "#2D1F1B",
+    "navy": "#604239",
+    "accent": "#43968E",
+    "accentInk": "#377A74"
   },
   "labels": {
-    "act": "Act"
+    "act": "Act",
+    "ask": "Ask a question",
+    "watch": "Watch live",
+    "qrTitle": "Scan to ask a question",
+    "qrNote": "Q&A open all day"
   },
   "cli": {
     "command": "onair --city",
@@ -50,7 +57,7 @@
   },
   "sessions": [
     {
-      "start": "09:00",
+      "start": "09:04",
       "dur": 10,
       "kind": "keynote",
       "title": "Opening",
@@ -58,8 +65,8 @@
       "role": "Host"
     },
     {
-      "start": "09:10",
-      "dur": 15,
+      "start": "09:14",
+      "dur": 42,
       "kind": "talk",
       "act": 1,
       "title": "The Latency Budget",
@@ -68,7 +75,7 @@
       "desc": "Where the milliseconds in a user request actually go, and the three changes that bought back half of them."
     },
     {
-      "start": "09:30",
+      "start": "10:01",
       "dur": 42,
       "kind": "talk",
       "act": 1,
@@ -78,13 +85,13 @@
       "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong."
     },
     {
-      "start": "10:12",
+      "start": "10:55",
       "dur": 10,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "10:22",
+      "start": "11:05",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -94,7 +101,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "11:09",
+      "start": "11:52",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -104,7 +111,7 @@
       "desc": "Running incident reviews people actually want to attend, with a template you can steal on the way out."
     },
     {
-      "start": "11:56",
+      "start": "12:39",
       "dur": 20,
       "kind": "talk",
       "act": 2,
@@ -115,13 +122,13 @@
       "qa": 5
     },
     {
-      "start": "12:16",
-      "dur": 60,
+      "start": "12:59",
+      "dur": 50,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "13:16",
+      "start": "13:49",
       "dur": 42,
       "kind": "talk",
       "act": 3,
@@ -131,7 +138,7 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "14:03",
+      "start": "14:36",
       "dur": 42,
       "kind": "talk",
       "act": 3,
@@ -141,7 +148,7 @@
       "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
     },
     {
-      "start": "14:50",
+      "start": "15:23",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
