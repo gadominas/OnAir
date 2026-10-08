@@ -33,6 +33,46 @@ header h1 span{color:var(--mint)}
 .hbtn{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;border-radius:9px;padding:8px 12px;font-weight:600;font-size:14px;text-decoration:none}
 .hbtn.primary{background:var(--mint);border-color:var(--mint);color:var(--ink)}
 .hbtn:disabled{opacity:.45;cursor:default}
+.opengroup{display:inline-flex;gap:0}
+.opengroup .hbtn{border-radius:0;margin-left:-1px}
+.opengroup .hbtn:first-child{border-radius:9px 0 0 9px;margin-left:0}
+.opengroup .hbtn:last-child{border-radius:0 9px 9px 0}
+.opengroup .lbl{font:600 11px var(--mono);color:#9FA3D6;align-self:center;margin-right:8px;text-transform:uppercase;letter-spacing:.05em}
+@media (max-width:760px){.opengroup .lbl{display:none}}
+/* screens panel */
+.screens{display:grid;gap:10px;margin-top:14px}
+.screen{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}
+@media (max-width:760px){.screen{grid-template-columns:1fr}}
+.screen b{font-size:14px}
+.screen small{display:block;color:var(--muted);font-size:12px}
+.screen code{font:500 13px var(--mono);word-break:break-all}
+.screen .acts{display:flex;gap:6px;flex-wrap:wrap}
+.screen .acts a,.screen .acts button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-weight:600;font-size:13px;text-decoration:none;color:inherit}
+.screen .acts a.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.screen .qr{grid-column:1/-1;display:none;justify-content:center}
+.screen.showqr .qr{display:flex}
+.screen .qr div{width:180px;aspect-ratio:1;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.screen .qr svg{display:block;width:100%;height:100%}
+
+/* decision panel: part of the sticky header, so the live moves are always in reach */
+.decide{background:var(--navy);color:#fff;border-top:1px solid rgba(255,255,255,.12)}
+header .decide .wrap{min-height:0;flex-wrap:nowrap;gap:16px;padding-top:8px;padding-bottom:8px}
+.dnow{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer}
+.dclock{font:600 22px var(--mono);color:var(--mint);font-variant-numeric:tabular-nums}
+.dwhat{display:flex;flex-direction:column;min-width:0}
+.dwhat small{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:#9FA3D6}
+.dwhat small.on{color:#FFB3B5}
+.dwhat small.qa{color:var(--mint)}
+.dwhat span{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dwhat em{font:normal 500 12px var(--mono);color:#C9CBE8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dacts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.dec{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:170px;padding:7px 11px;border-radius:10px;border:1px solid var(--mint);background:var(--mint);color:var(--ink);text-align:left}
+.dec b{font-size:14px}
+.dec small{font:500 11px var(--mono);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dec.cut{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.dec:disabled{background:transparent;color:#9FA3D6;border-color:rgba(255,255,255,.16);cursor:default}
+.dbar{display:block;height:3px;background:var(--mint);width:0}
+@media (max-width:1100px){header .decide .wrap{flex-wrap:wrap}.dacts{justify-content:flex-start;width:100%}.dec{width:auto;flex:1 1 150px}}
 
 /* live control */
 .live{background:var(--ink);color:#fff;padding:18px 0 22px;border-bottom:4px solid var(--mint)}
@@ -42,7 +82,8 @@ header h1 span{color:var(--mint)}
 .clock b{font:600 44px/1 var(--mono);color:var(--mint);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .clock small{color:#9FA3D6;font-size:12px}
 .clock .pretend{display:flex;gap:6px;align-items:center;font-size:12px;color:#C9CBE8}
-.clock .pretend input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;padding:3px 6px;font:500 12px var(--mono)}
+.clock .pretend input,.clock .pretend select{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;padding:3px 6px;font:500 12px var(--mono)}
+.clock .pretend select{padding:3px 4px}
 .clock .pretend button{background:none;border:0;color:#9FA3D6;text-decoration:underline;font-size:12px;padding:0}
 .lcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .lcard small{font:600 12px var(--mono);color:#9FA3D6;text-transform:uppercase;letter-spacing:.04em}
@@ -108,7 +149,104 @@ details.settings{margin-top:28px;background:var(--card);border:1px solid var(--l
 details.settings summary{font-weight:700;cursor:pointer}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:14px}
 .grid label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
-.grid input{border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.grid input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0}
+.grid .wide{grid-column:span 2}
+@media (max-width:640px){.grid .wide{grid-column:auto}}
+
+/* branding */
+.brandgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:14px}
+.brandgrid label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.brandgrid input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0}
+.brandgrid .wide{grid-column:span 2}
+.logoPrev{display:flex;align-items:center;gap:10px;min-height:40px;padding:6px 10px;border-radius:9px;background:#0F0F46;color:#C9CBE8;font-size:12px}
+.logoPrev img{height:28px;max-width:160px;object-fit:contain}
+.palettes{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.palettes button{display:flex;align-items:center;gap:8px;border:2px solid var(--line);background:#fff;border-radius:11px;padding:6px 10px 6px 6px;font-weight:600;font-size:13px}
+.palettes button[aria-pressed=true]{border-color:var(--text)}
+.sw{display:flex;border-radius:7px;overflow:hidden}
+.sw i{width:16px;height:26px;display:block}
+.colors{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;align-items:center;font-size:12px;color:var(--muted)}
+.colors label{display:flex;align-items:center;gap:6px}
+.colors input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0;background:none}
+.colors button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600}
+.colors .note{font-weight:600;color:var(--text)}
+/* palette from an image */
+.fromimg{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:760px){.fromimg{grid-template-columns:1fr}}
+.fromimg h3{margin:0 0 4px;font-size:15px}
+.fromimg p{margin:0 0 10px;color:var(--muted);font-size:13px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;cursor:pointer;min-height:96px}
+.drop.over{border-color:var(--mint);background:#F0FBF7}
+.drop img{width:72px;height:72px;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/12px 12px;flex:none}
+.drop span{font-size:13px;color:var(--muted)}
+.fromimg .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fromimg button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;font-weight:600;font-size:13px}
+.fromimg button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fromimg button:disabled{opacity:.45;cursor:default}
+.dominant{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.dominant button{display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;background:none;padding:2px;border-radius:9px;font:500 11px var(--mono);color:var(--muted)}
+.dominant button i{width:40px;height:40px;border-radius:7px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.dominant button[aria-pressed=true]{border-color:var(--text)}
+.mock{border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.mock .mhead{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.mock .mhead b{color:#fff;font-size:16px}
+.mock .mhead .mbar{height:6px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
+.mock .mhead .mbar i{display:block;height:100%;width:62%}
+.mock .mhead .row2{display:flex;gap:8px;align-items:center}
+.mock .mhead .mbtn{padding:6px 10px;border-radius:8px;font-weight:700;font-size:12px}
+.mock .mhead .mtag{font:600 11px var(--mono);padding:3px 8px;border-radius:6px;color:#fff}
+.mock .mbody{background:#F5F6FA;padding:10px 16px;font-size:12px;color:#5D6088}
+.mock .mbody b{font:600 12px var(--mono)}
+.gensw{display:flex;gap:6px;margin:10px 0 0;font:500 11px var(--mono);color:var(--muted);flex-wrap:wrap}
+.gensw span{display:flex;align-items:center;gap:5px}
+.gensw i{width:16px;height:16px;border-radius:4px;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+
+/* QR code generator */
+.qrgen{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:start;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+@media (max-width:640px){.qrgen{grid-template-columns:1fr}}
+.qrgen .tile{width:200px;aspect-ratio:1;background:#fff;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;overflow:hidden}
+.qrgen .tile svg{width:100%;height:100%;display:block}
+.qrgen .tile span{color:var(--muted);font-size:13px;padding:12px;text-align:center}
+.qrgen h3{margin:0 0 4px;font-size:15px}
+.qrgen p{margin:0 0 10px;color:var(--muted);font-size:13px}
+.qrgen label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.qrgen input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;font:inherit}
+.qrgen .btns{display:flex;gap:8px;flex-wrap:wrap}
+.qrgen button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;font-weight:600;font-size:13px}
+.qrgen button:hover{border-color:var(--mint)}
+.qrgen button:disabled{opacity:.45;cursor:default}
+.qrgen .src{font:500 12px var(--mono);color:var(--muted);word-break:break-all}
+/* borrow picker: which slot gives up the minutes, with a preview of the new times */
+dialog.pick{border:0;border-radius:16px;padding:0;width:min(780px,96vw);max-height:90vh;box-shadow:0 24px 60px rgba(15,15,70,.35);color:var(--text)}
+dialog.pick::backdrop{background:rgba(15,15,70,.45)}
+.pick form{display:flex;flex-direction:column;max-height:90vh;margin:0}
+.pick .phead{display:flex;gap:16px;align-items:flex-start;padding:16px 20px 12px;border-bottom:1px solid var(--line)}
+.pick .phead div{flex:1;min-width:0}
+.pick h2{margin:0 0 4px;font-size:18px}
+.pick .phead p{margin:0;color:var(--muted);font-size:13px}
+.pick .amt{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.pick .amt select{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:600 14px var(--mono)}
+.prows{overflow:auto;padding:8px 12px}
+.prow{display:grid;grid-template-columns:22px 128px minmax(0,1fr) 150px;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;border:2px solid transparent}
+.prow.can{cursor:pointer}
+.prow.can:hover{background:var(--paper)}
+.prow.sel{background:#F0FBF7;border-color:var(--mint)}
+.prow.ctx{color:var(--muted)}
+.prow input{accent-color:var(--mint-ink);width:16px;height:16px;margin:0}
+.prow .t,.prow .len{font:500 13px var(--mono);font-variant-numeric:tabular-nums}
+.prow .n{min-width:0}
+.prow .n b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow .n small{display:block;font-size:12px;color:var(--muted)}
+.prow s{color:var(--muted)}
+.prow .later{color:#B4232A;font-weight:600}
+.prow .sooner{color:var(--mint-ink);font-weight:600}
+.prow.none .n b{white-space:normal}
+.pfoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--line)}
+.pfoot .psum{margin-right:auto;font:500 13px var(--mono);color:var(--muted)}
+.pfoot button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-weight:700}
+.pfoot button.primary{background:var(--mint);border-color:var(--mint);color:var(--ink)}
+.pfoot button:disabled{opacity:.4;cursor:default}
+@media (max-width:640px){.prow{grid-template-columns:22px 1fr}.prow .n,.prow .len{grid-column:2}}
 
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;
   padding:11px 16px;font-size:14px;box-shadow:0 10px 30px rgba(15,15,70,.35);display:none;max-width:min(680px,92vw);z-index:40}
@@ -125,8 +263,27 @@ details.settings summary{font-weight:700;cursor:pointer}
     <span class="status" id="status">Loading…</span>
     <button class="hbtn" id="undo" type="button" title="Undo (⌘Z / Ctrl+Z)">Undo</button>
     <button class="hbtn" id="redo" type="button" title="Redo (⇧⌘Z / Ctrl+Y)">Redo</button>
-    <a class="hbtn" id="preview" target="_blank" rel="noopener" title="Live page using this local agenda">Preview</a>
+    <span class="opengroup" role="group" aria-label="Open a screen in a new tab">
+      <span class="lbl">Open</span>
+      <a class="hbtn" data-open="/" target="_blank" rel="noopener" title="Live agenda (attendees)">Agenda</a>
+      <a class="hbtn" data-open="/?mode=present" target="_blank" rel="noopener" title="Agenda in presentation mode (projector)">Presentation</a>
+      <a class="hbtn" data-open="/timer.html" target="_blank" rel="noopener" title="Speaker timer (confidence monitor)">Timer</a>
+    </span>
     <button class="hbtn primary" id="publish" type="button" title="Commit and push agenda.json so the live page picks it up">Publish</button>
+  </div>
+  <div class="decide" aria-label="Live decisions">
+    <div class="wrap">
+      <div class="dnow" id="dNow" title="Back to live control">
+        <b class="dclock" id="dClock">--:--</b>
+        <div class="dwhat"><small id="dTag">Now</small><span id="dTitle">—</span><em id="dMeta"></em></div>
+      </div>
+      <div class="dacts" id="dActs" role="group" aria-label="Decisions">
+        <button type="button" class="dec" data-dec="talk" disabled><b></b><small></small></button>
+        <button type="button" class="dec" data-dec="qa" disabled><b></b><small></small></button>
+        <button type="button" class="dec cut" data-dec="borrow" disabled><b></b><small></small></button>
+      </div>
+    </div>
+    <i class="dbar" id="dBar"></i>
   </div>
 </header>
 
@@ -137,6 +294,11 @@ details.settings summary{font-weight:700;cursor:pointer}
       <b id="clock">--:--</b>
       <div class="pretend">
         <span>Pretend it's</span><input type="time" id="pretend" step="60" aria-label="Pretend the time is">
+        <select id="speed" aria-label="Clock speed" title="Run the pretend clock faster to rehearse the day">
+          <option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option>
+          <option value="30">30×</option><option value="60">60× (1 min/s)</option><option value="300">300× (5 min/s)</option>
+          <option value="0">paused</option>
+        </select>
         <button type="button" id="realTime" hidden>use real time</button>
       </div>
     </div>
@@ -173,6 +335,60 @@ details.settings summary{font-weight:700;cursor:pointer}
     <p class="hint" id="hint">Drag ⠿ to reorder. Times re-flow automatically: each session follows the previous one, plus the changeover after a talk unless a break comes next. The changeover isn't shown on the public agenda. Changes save to agenda.json as you go; Publish pushes them live.</p>
     <div id="list"></div>
 
+    <details class="settings" id="screensBox">
+      <summary>Screens: open the agenda, presentation and timer</summary>
+      <p class="hint" style="margin:10px 0 0" id="screensHint">Open a screen here, or on another device on the same network (the projector computer, a tablet on the lectern for the speaker timer): copy its address or scan its QR code.</p>
+      <div class="screens" id="screens"></div>
+    </details>
+
+    <details class="settings">
+      <summary>Branding: name, logo &amp; colours</summary>
+      <div class="brandgrid" id="brandSettings"></div>
+      <div class="palettes" id="palettes" role="group" aria-label="Colour palette"></div>
+      <div class="colors" id="colors"></div>
+      <div class="fromimg" id="fromImg">
+        <div>
+          <h3>Generate a palette from an image</h3>
+          <p>Drop in your event's artwork (key visual, poster, logo). Its dominant colours are detected here in the browser (nothing is uploaded) and turned into a readable palette.</p>
+          <label class="drop" id="drop">
+            <img id="imgPrev" alt="" hidden>
+            <span id="dropText">Drop an image here, or click to choose a file (PNG, JPG, SVG, WebP)</span>
+            <input type="file" id="imgFile" accept="image/*" hidden>
+          </label>
+          <div class="btns"><button type="button" id="fromLogo">Analyse the event logo</button></div>
+        </div>
+        <div id="genOut" hidden>
+          <h3>Dominant colours</h3>
+          <p>Click a colour to use it as the accent.</p>
+          <div class="dominant" id="dominant"></div>
+          <div class="mock" id="mock"></div>
+          <div class="gensw" id="genSw"></div>
+          <div class="btns"><button type="button" class="primary" id="applyGen">Apply this palette</button></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="settings">
+      <summary>Links &amp; QR code</summary>
+      <p class="hint" style="margin:10px 0 0">Empty links hide their buttons. Links take effect on this computer's screens at once; Publish puts them on the published site.</p>
+      <div class="grid" id="linkSettings"></div>
+      <div class="qrgen" id="qrGen">
+        <div class="tile" id="qrPreview"><span>Set a Q&amp;A link to get a QR code.</span></div>
+        <div>
+          <h3>QR code generator</h3>
+          <p>The QR code for the Q&amp;A link, as on the presentation screen. Download it for slides, posters or badges, or generate one for any other URL.</p>
+          <label>URL<input type="url" id="qrInput" placeholder="https://…"></label>
+          <div class="src" id="qrSource"></div>
+          <div class="btns" style="margin-top:10px">
+            <button type="button" id="qrSvg">Download SVG</button>
+            <button type="button" id="qrPng">Download PNG</button>
+            <button type="button" id="qrCopy">Copy link</button>
+            <button type="button" id="qrReset">Use the event's link</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <details class="settings">
       <summary>Event settings and acts</summary>
       <div class="grid" id="settings"></div>
@@ -180,19 +396,38 @@ details.settings summary{font-weight:700;cursor:pointer}
   </div>
 </main>
 
+<dialog class="pick" id="pickDlg" aria-labelledby="pickTitle">
+  <form method="dialog">
+    <div class="phead">
+      <div><h2 id="pickTitle"></h2><p id="pickHint"></p></div>
+      <label class="amt">Minutes<select id="pickAmt"><option>5</option><option>10</option><option>15</option></select></label>
+    </div>
+    <div class="prows" id="pickRows" role="radiogroup" aria-label="Borrow the time from"></div>
+    <div class="pfoot">
+      <span class="psum" id="pickSum"></span>
+      <button value="cancel">Cancel</button>
+      <button type="button" class="primary" id="pickApply">Apply</button>
+    </div>
+  </form>
+</dialog>
+
 <div class="toast" id="toast" role="status"></div>
 
 <script>
 /* ======================= state ======================= */
 const API = { "Content-Type": "application/json", "X-Agenda-Admin": "1" };
 const MIN_BREAK = 5;
+const EXTEND = 5;             // minutes "+5 min" adds to a running talk or its Q&A
+const EXTEND_FROM = 5;        // the talk part can be extended in its last this-many minutes
+const DEDUCT = 5;             // minutes "−5 min" takes off the next talk or coffee break
+const MIN_TALK = 5;           // a talk part is never cut below this
 let A = null;                 // the agenda being edited
 let synced = "";              // the agenda as last read from or written to agenda.json (JSON text)
 let inFlight = false;         // a save request is on its way
 let undoStack = [], redoStack = [];
 let pending = [];             // labels of changes since the last publish
 let saveTimer = null, saving = Promise.resolve(), lastSaveError = null;
-let clockOffsetMs = 0;        // "pretend it's" offset from real time
+let mock = null;              // "pretend it's" clock: { base: ms, anchor: real ms, speed }; null = real time
 let publishing = false, lastPublished = null;
 const rowKeys = new WeakMap();   // session → key, so expanded rows stay open across re-renders
 
@@ -242,12 +477,88 @@ function startAt(i, T, { publish } = {}) {
     const chain = end(prev) + gapAfter(i - 1);
     if (T >= chain) sl.set(s, T - chain);
     else { sl.set(s, 0); prev.dur = Math.max(1, T - gapAfter(i - 1) - m(prev.start)); } // previous one ended early
-    const delay = T - oldStart;
-    if ($("absorb").checked && delay > 0) {
-      const b = S().slice(i + 1).find(x => x.kind === "break");
-      if (b) b.dur -= Math.max(0, Math.min(delay, b.dur - MIN_BREAK));
-    }
+    catchUp(i, T - oldStart);
   }, { publish });
+}
+
+// "Catch up": take a delay out of the next break, keeping at least MIN_BREAK minutes of it.
+function catchUp(i, delay) {
+  if (!$("absorb").checked || delay <= 0) return;
+  const b = S().slice(i + 1).find(x => x.kind === "break");
+  if (b) b.dur -= Math.max(0, Math.min(delay, b.dur - MIN_BREAK));
+}
+
+// A live move: extend the running talk i (its "talk" part or its "qa") by amount minutes, and/or take amount
+// minutes from slot j (a talk gives up talk time and keeps its Q&A; a break just gets shorter). Re-flow does the rest:
+// sessions between the two move by amount, everything after j stays put.
+const setQa = (s, qa) => { if (qa === A.timing.qaMinutes) delete s.qa; else s.qa = qa; };
+function applyMove({ i, part, j, amount }) {
+  if (i != null) { const s = S()[i]; if (part === "qa") setQa(s, qaOf(s) + amount); s.dur += amount; }
+  if (j != null) S()[j].dur -= amount;
+}
+// Why slot s can't give up amount minutes ("" if it can).
+function cantTake(s, amount, now) {
+  if (s.kind === "talk") return s.dur - qaOf(s) - amount < MIN_TALK ? `talk part is only ${s.dur - qaOf(s)} min` : "";
+  if (s.dur - amount < MIN_BREAK) return `only ${s.dur} min (keeps at least ${MIN_BREAK})`;
+  return end(s) - amount <= now ? "ends too soon" : "";
+}
+// Slots that can lend time: talks that haven't started and breaks (coffee and lunch) that haven't ended.
+const lenders = (now, skip) => S().map((s, k) => k).filter(k => k !== skip &&
+  (S()[k].kind === "talk" ? m(S()[k].start) > now : S()[k].kind === "break" && end(S()[k]) > now));
+// Run a change on a copy of the agenda and return the copy's sessions, for previews.
+function simulate(fn) {
+  const real = A; A = JSON.parse(JSON.stringify(real));
+  try { const sl = slackMap(); fn(sl); reflow(sl, m(S()[0].start)); return S(); } finally { A = real; }
+}
+
+/* ---------- borrow picker ---------- */
+let pick = null;   // { i, part, amount, j, now }: i/part = the extension (null for "win back time"), j = lending slot
+const nowMin = () => { const { min, sec } = eventNow(); return min + sec / 60; };
+const lenText = s => s.kind === "talk" && qaOf(s) ? `${s.dur - qaOf(s)}+${qaOf(s)} min` : `${s.dur} min`;
+const change = (a, b, later) => a === b ? esc(a) : `<s>${esc(a)}</s> → <span class="${later ? "later" : "sooner"}">${esc(b)}</span>`;
+function openPick(i, part) {
+  pick = { i: i ?? null, part, amount: i != null ? EXTEND : DEDUCT, j: i != null ? null : undefined, now: nowMin() };
+  $("pickAmt").value = String(pick.amount);
+  renderPick();
+  $("pickDlg").showModal();
+}
+function renderPick() {
+  const { i, part, amount, now } = pick;
+  const ext = i != null, s = ext ? S()[i] : null;
+  const ok = lenders(now, i).filter(k => !cantTake(S()[k], amount, now));
+  if (pick.j != null && !ok.includes(pick.j)) pick.j = ext ? null : undefined;   // a bigger amount can rule the pick out
+  $("pickTitle").textContent = ext ? `+${amount} min ${part === "qa" ? "Q&A" : "talk"}: ${s.title}` : `Win back ${amount} min`;
+  $("pickHint").textContent = ext
+    ? `Borrow the ${amount} minutes from a later talk or break, so the day after it stays on time. Or don't borrow and let the rest of the day run later.`
+    : `Pick the talk or break that gives up ${amount} minutes. Everything after it moves ${amount} minutes earlier.`;
+  const after = pick.j === undefined ? S() : simulate(() => applyMove(pick));
+  const ci = S().findIndex(x => now >= m(x.start) && now < end(x));
+  const from = ext ? i : ci >= 0 ? ci : S().findIndex(x => m(x.start) > now);
+  const all = lenders(now, i);
+  let html = ext ? `<label class="prow can none ${pick.j === null ? "sel" : ""}"><input type="radio" name="pickFrom" value="none" ${pick.j === null ? "checked" : ""}>
+    <span class="t">—</span><span class="n"><b>Don't borrow</b><small>everything after it runs ${amount} min later</small></span><span class="len"></span></label>` : "";
+  for (let k = Math.max(0, from); k < S().length; k++) {
+    const a = S()[k], b = after[k], why = all.includes(k) ? cantTake(a, amount, now) : null;
+    const can = why === "", sel = pick.j === k;
+    const tag = k === i ? (part === "qa" ? "Q&A extended" : "talk extended") : a.kind === "break" ? "break" : a.kind === "keynote" ? "keynote" : a.who || "talk";
+    html += `<label class="prow ${can ? "can" : "ctx"} ${sel ? "sel" : ""}">
+      ${can ? `<input type="radio" name="pickFrom" value="${k}" ${sel ? "checked" : ""}>` : "<span></span>"}
+      <span class="t">${change(a.start, b.start, m(b.start) > m(a.start))}</span>
+      <span class="n"><b>${esc(a.title)}</b><small>${esc(why ? `${tag} · can't lend: ${why}` : tag)}</small></span>
+      <span class="len">${change(lenText(a), lenText(b), b.dur > a.dur)}</span></label>`;
+  }
+  $("pickRows").innerHTML = html;
+  const endA = end(S().at(-1)), endB = end(after.at(-1));
+  $("pickSum").innerHTML = pick.j === undefined ? "Pick a talk or break" : `Day ends ${change(f(endA), f(endB), endB > endA)}`;
+  $("pickApply").disabled = pick.j === undefined;
+}
+function applyPick() {
+  const { i, part, amount, j } = pick, s = i != null ? S()[i] : null, t = j != null ? S()[j] : null;
+  const what = s ? `${s.title}: ${part === "qa" ? "Q&A" : "talk"} +${amount} min` : `Won back ${amount} min`;
+  edit(t ? `${what}, from ${t.title}` : what, () => applyMove(pick), { publish: true });
+  $("pickDlg").close();
+  toast(t ? `${amount} min taken from ${t.title} (${t.start}, now ${lenText(t)}).` + (s ? " The day after it stays on time." : ` Everything after it moves ${amount} min earlier.`)
+    : `${part === "qa" ? "Q&A" : "Talk"} extended by ${amount} min: everything after it moves ${amount} min later.`);
 }
 
 function assignAct(i) {
@@ -291,7 +602,7 @@ async function save() {
 // Pick up changes made outside this page (another admin tab, a git pull, a hand edit), so a tab left
 // open never writes an old copy of the agenda back over newer changes. Skipped while you're editing here.
 async function syncFromDisk() {
-  if (!A || saveTimer || inFlight || publishing || document.activeElement?.matches?.("#list *, #settings *")) return;
+  if (!A || $("pickDlg").open || saveTimer || inFlight || publishing || document.activeElement?.matches?.("#list *, #settings *, #linkSettings *, #brandSettings *, #colors *")) return;
   try {
     const r = await fetch("/api/agenda", { cache: "no-store" });
     if (!r.ok) return;
@@ -344,18 +655,24 @@ function toast(text, bad = false) {
 }
 function undo() {
   if (!undoStack.length) return;
-  redoStack.push(JSON.stringify(A)); A = JSON.parse(undoStack.pop());
+  const links = A.links;
+  redoStack.push(JSON.stringify(A)); A = JSON.parse(undoStack.pop()); A.links = links;   // links aren't part of undo
   pending.push("undo"); scheduleSave(); render();
 }
 function redo() {
   if (!redoStack.length) return;
-  undoStack.push(JSON.stringify(A)); A = JSON.parse(redoStack.pop());
+  const links = A.links;
+  undoStack.push(JSON.stringify(A)); A = JSON.parse(redoStack.pop()); A.links = links;
   pending.push("redo"); scheduleSave(); render();
 }
 
 /* ======================= clock ======================= */
-function eventNow() {
-  const d = new Date(Date.now() + clockOffsetMs);
+const nowMs = () => mock ? mock.base + (Date.now() - mock.anchor) * mock.speed : Date.now();
+// (Re)start the pretend clock at ms, running at speed (0 = paused).
+function setMock(ms, speed) { mock = { base: ms, anchor: Date.now(), speed }; $("realTime").hidden = false; renderLive(); }
+function realTime() { mock = null; $("pretend").value = ""; $("speed").value = "1"; $("realTime").hidden = true; renderLive(); }
+function eventNow(ms = nowMs()) {
+  const d = new Date(ms);
   const p = new Intl.DateTimeFormat("en-GB", { timeZone: A.event.timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(d);
   const g = t => +p.find(x => x.type === t).value;
   return { min: g("hour") * 60 + g("minute"), sec: g("second") };
@@ -411,9 +728,356 @@ function render() {
     list.appendChild(el);
   });
   renderSettings();
+  renderBranding();
+  renderLinks();
+  renderQrGen();
   renderLive();
   setStatus();
 }
+
+// One Q&A link drives the Ask buttons (opened in a new tab) and the QR code.
+const LINK_FIELDS = [
+  ["qa", "Q&A link (Ask buttons, QR code)", "https://app.sli.do/event/…"],
+  ["stream", "Watch live (livestream)", "https://…"],
+];
+const LABEL_FIELDS = [
+  ["qrTitle", "QR code title", "Scan to ask a question"],
+  ["qrNote", "QR code note", "Q&A open all day"],
+  ["ask", "“Ask” button text", "Ask a question"],
+  ["watch", "“Watch” button text", "Watch live"],
+];
+function renderLinks() {
+  const g = $("linkSettings");
+  if (g.contains(document.activeElement)) return; // don't clobber typing
+  const L = A.links || {}, T = A.labels || {};
+  g.innerHTML =
+    LINK_FIELDS.map(([k, name, ph]) => `<label class="wide">${esc(name)}<input type="url" data-link="${k}" value="${esc(L[k] ?? "")}" placeholder="${esc(ph)}"></label>`).join("") +
+    LABEL_FIELDS.map(([k, name, ph]) => `<label>${esc(name)}<input data-s="labels.${k}" value="${esc(T[k] ?? "")}" placeholder="${esc(ph)}"></label>`).join("");
+}
+/* ---------- QR code generator ---------- */
+// Same encoder as the public pages (vendor/qrcode.mjs, served by the local server). Loaded on first use.
+let qrLib = null, qrOverride = false;
+const qrEventUrl = () => (A?.links?.qa || "").trim();
+async function qrMatrix(url) {
+  qrLib ??= (await import("/vendor/qrcode.mjs")).default;
+  const q = qrLib(0, "M"); q.addData(url); q.make();
+  return q;
+}
+function qrSvg(q, quiet = 4) {
+  const n = q.getModuleCount(), w = n + 2 * quiet;
+  let d = "";
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; ) {
+    if (!q.isDark(y, x)) { x++; continue; }
+    const x0 = x; while (x < n && q.isDark(y, x)) x++;
+    d += `M${x0 + quiet} ${y + quiet}h${x - x0}v1h-${x - x0}z`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${w}" shape-rendering="crispEdges"><rect width="${w}" height="${w}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+async function renderQrGen() {
+  const input = $("qrInput");
+  if (!qrOverride && document.activeElement !== input) input.value = qrEventUrl();
+  const url = input.value.trim();
+  $("qrSource").textContent = !url ? "" : qrOverride ? "Custom URL (not saved to the event)" :
+    "From the Q&A link";
+  ["qrSvg", "qrPng", "qrCopy"].forEach(id => $(id).disabled = !url);
+  $("qrReset").hidden = !qrOverride;
+  if (!url) { $("qrPreview").innerHTML = "<span>Set a Q&amp;A link to get a QR code.</span>"; return; }
+  try {
+    $("qrPreview").innerHTML = qrSvg(await qrMatrix(url));
+    $("qrPreview").title = url;
+  } catch (e) { $("qrPreview").innerHTML = `<span>Can't make a QR code for this (${esc(e.message || e)}).</span>`; }
+}
+function download(name, blob) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const qrName = ext => `qr-${(A.event?.name || "onair").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.${ext}`;
+$("qrInput").addEventListener("input", () => { qrOverride = $("qrInput").value.trim() !== qrEventUrl(); renderQrGen(); });
+$("qrReset").addEventListener("click", () => { qrOverride = false; renderQrGen(); });
+$("qrSvg").addEventListener("click", async () => {
+  download(qrName("svg"), new Blob([qrSvg(await qrMatrix($("qrInput").value.trim()))], { type: "image/svg+xml" }));
+});
+$("qrPng").addEventListener("click", async () => {
+  // 1024 px wide-ish PNG, crisp modules (no smoothing), white quiet zone.
+  const q = await qrMatrix($("qrInput").value.trim()), quiet = 4, n = q.getModuleCount(), scale = Math.ceil(1024 / (n + 2 * quiet));
+  const c = document.createElement("canvas"); c.width = c.height = (n + 2 * quiet) * scale;
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.fillStyle = "#000";
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) g.fillRect((x + quiet) * scale, (y + quiet) * scale, scale, scale);
+  c.toBlob(b => download(qrName("png"), b), "image/png");
+});
+$("qrCopy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("qrInput").value.trim()); toast("Link copied."); }
+  catch (e) { toast("Couldn't copy; select the URL field and copy it.", true); }
+});
+
+// Links go through their own server route (PUT /api/links); a general save never changes them.
+async function saveLinks(patch) {
+  try {
+    if (await flush() === false) throw new Error("save failed");
+    const r = await fetch("/api/links", { method: "PUT", headers: API, body: JSON.stringify({ links: patch }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+    A.links = j.links; synced = JSON.stringify(A);
+    renderQrGen();
+    pending.push(`links: ${Object.keys(patch).join(", ")}`); setStatus();
+    toast("Link saved. Screens on this computer pick it up within seconds; Publish updates the published site.");
+  } catch (e) {
+    toast(`Couldn't save the link: ${e.message}`, true);
+    renderLinks();
+  }
+}
+
+/* ---------- screens ---------- */
+const SCREENS = [
+  ["/", "Live agenda", "Attendees' phones and laptops"],
+  ["/?mode=present", "Presentation", "Projector or TV for the audience"],
+  ["/timer.html", "Speaker timer", "Confidence monitor or tablet for the speaker"],
+];
+let netBase = null;   // e.g. "http://192.168.1.20:4242" for other devices; null = this computer only
+// While "Pretend it's" is on, opened screens rehearse the same moment at the same speed (?sim=HH:MM:SS&speed=N).
+function withSim(path) {
+  if (!mock || !A) return path;
+  const { min, sec } = eventNow();
+  const t = `${f(min)}:${pad(Math.floor(sec))}`;
+  return path + (path.includes("?") ? "&" : "?") + "sim=" + t + (mock.speed !== 1 ? "&speed=" + mock.speed : "");
+}
+function updateOpenLinks() {
+  document.querySelectorAll("[data-open]").forEach(a => a.href = withSim(a.dataset.open));
+  document.querySelectorAll("[data-screen-open]").forEach(a => a.href = withSim(a.dataset.screenOpen));
+}
+async function renderScreens() {
+  try {
+    const r = await fetch("/api/addresses", { cache: "no-store" });
+    const j = await r.json();
+    netBase = j.lan?.length ? `http://${j.lan[0]}:${j.port}` : null;
+  } catch (e) { netBase = null; }
+  $("screensHint").textContent = netBase
+    ? "Open a screen here, or on another device on the same network (the projector computer, a tablet on the lectern for the speaker timer): copy its address or scan its QR code."
+    : "Only this computer can open the screens right now (the server isn't reachable from the network, e.g. started with HOST=127.0.0.1).";
+  $("screens").innerHTML = SCREENS.map(([path, name, use], i) => {
+    const url = (netBase || location.origin) + path;
+    return `<div class="screen" data-i="${i}">
+      <div><b>${esc(name)}</b><small>${esc(use)}</small></div>
+      <code>${esc(url)}</code>
+      <div class="acts">
+        <a class="primary" data-screen-open="${esc(path)}" href="${esc(path)}" target="_blank" rel="noopener">Open</a>
+        <button type="button" data-copy="${esc(url)}">Copy</button>
+        ${netBase ? `<button type="button" data-qr="${i}">QR</button>` : ""}
+      </div>
+      <div class="qr"><div></div></div>
+    </div>`;
+  }).join("");
+  updateOpenLinks();
+}
+$("screens").addEventListener("click", async e => {
+  const c = e.target.closest("[data-copy]");
+  if (c) {
+    try { await navigator.clipboard.writeText(c.dataset.copy); toast("Address copied."); }
+    catch (err) { toast("Couldn't copy; select the address and copy it.", true); }
+    return;
+  }
+  const q = e.target.closest("[data-qr]");
+  if (q) {
+    const row = q.closest(".screen"), url = row.querySelector("code").textContent;
+    row.classList.toggle("showqr");
+    if (row.classList.contains("showqr")) row.querySelector(".qr div").innerHTML = qrSvg(await qrMatrix(url));
+  }
+});
+
+/* ---------- branding ---------- */
+let THEMES = {}, resolveTheme = t => t;   // filled from /themes.mjs at boot (the same file the pages use)
+const BRAND_FIELDS = [
+  ["event.name", "Event name", "My Conference 2027", "wide"],
+  ["event.brand.title", "Header title", "OnAir"],
+  ["event.brand.number", "Header tag (optional)", "Demo"],
+  ["event.city", "City", "Lisbon"],
+  ["event.logo", "Logo (image URL or path; replaces the pixel mark)", "https://…/logo.svg", "wide"],
+];
+const getPath = path => path.split(".").reduce((o, k) => o?.[k], A);
+function renderBranding() {
+  const g = $("brandSettings");
+  if (!g.contains(document.activeElement)) {
+    g.innerHTML = BRAND_FIELDS.map(([path, name, ph, cls]) =>
+      `<label class="${cls || ""}">${esc(name)}<input data-s="${path}" value="${esc(getPath(path) ?? "")}" placeholder="${esc(ph)}"></label>`).join("") +
+      `<div class="logoPrev wide" id="logoPrev"></div>`;
+  }
+  const logo = A.event?.logo;
+  $("logoPrev").innerHTML = logo ? `<img src="${esc(logo)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Couldn\'t load this image.'}))"><span>Logo preview (on the dark header)</span>` : "<span>No logo: the pixel mark is shown.</span>";
+  const preset = A.theme?.preset === "custom" ? "" : THEMES[A.theme?.preset] ? A.theme.preset : "midnight";
+  $("palettes").innerHTML = Object.entries(THEMES).map(([k, t]) =>
+    `<button type="button" data-preset="${k}" aria-pressed="${k === preset}"><span class="sw"><i style="background:${t.ink}"></i><i style="background:${t.navy}"></i><i style="background:${t.accent}"></i><i style="background:${t.accentInk}"></i></span>${esc(t.name)}</button>`).join("");
+  const c = resolveTheme(A.theme || {}), custom = ["ink", "navy", "accent", "accentInk"].some(k => A.theme?.[k]);
+  $("colors").innerHTML = [["ink", "Background"], ["navy", "Secondary"], ["accent", "Accent"], ["accentInk", "Accent on light"]]
+    .map(([k, name]) => `<label><input type="color" data-color="${k}" value="${c[k]}">${name}</label>`).join("") +
+    (A.theme?.preset === "custom" ? `<span class="note">Custom palette${A.theme.source === "image" ? " (generated from an image)" : ""}</span><button type="button" id="resetColors">Back to Midnight</button>`
+      : custom ? `<button type="button" id="resetColors">Back to the palette's colours</button>` : "");
+}
+$("palettes").addEventListener("click", e => {
+  const b = e.target.closest("[data-preset]"); if (!b) return;
+  edit(`Palette: ${THEMES[b.dataset.preset].name}`, () => { A.theme = { preset: b.dataset.preset }; return { noReflow: true }; });
+});
+$("colors").addEventListener("change", e => {
+  const k = e.target.dataset.color; if (!k) return;
+  edit(`Colour ${k}`, () => { A.theme = { ...(A.theme || {}), [k]: e.target.value }; return { noReflow: true }; });
+});
+$("colors").addEventListener("click", e => {
+  if (e.target.id !== "resetColors") return;
+  edit("Palette colours", () => { A.theme = { preset: THEMES[A.theme?.preset] ? A.theme.preset : "midnight" }; return { noReflow: true }; });
+});
+
+/* ---------- palette from an image ---------- */
+// 1. Draw the image small (max 96 px), skip transparent pixels.  2. k-means (k = 6) in RGB → dominant colours with shares.
+// 3. Build the four theme colours from them, adjusted for contrast (WCAG): white text on the background, accent visible on
+//    the background (≥ 3:1), accent-on-light readable on the light page (≥ 4.5:1).
+const hex = ([r, g, b]) => "#" + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, "0")).join("").toUpperCase();
+function rgb2hsl([r, g, b]) {
+  r /= 255; g /= 255; b /= 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  if (!d) return [0, 0, l];
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [(h * 60 + 360) % 360, s, l];
+}
+function hsl2rgb([h, s, l]) {
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+}
+const lum = rgb => { const [r, g, b] = rgb.map(v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
+const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + .05) / (y + .05); };
+const WHITE = [255, 255, 255], PAPER = [245, 246, 250];
+
+async function loadPixels(src) {
+  const img = new Image();
+  img.crossOrigin = "anonymous";               // logos on other sites only work if they allow it (CORS)
+  // the load event, not img.decode(): decode() can wait forever while the tab is in the background
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = () => reject(new Error("the image couldn't be loaded"));
+    img.src = src;
+  });
+  const scale = Math.min(1, 96 / Math.max(img.naturalWidth || 96, img.naturalHeight || 96));
+  const w = Math.max(1, Math.round((img.naturalWidth || 96) * scale)), h = Math.max(1, Math.round((img.naturalHeight || 96) * scale));
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(img, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h).data, px = [];
+  for (let i = 0; i < d.length; i += 4) if (d[i + 3] >= 128) px.push([d[i], d[i + 1], d[i + 2]]);
+  return px;
+}
+function dominantColours(px, k = 6) {
+  if (!px.length) return [];
+  // k-means++ seeding (deterministic: first seed is the mean), then 12 iterations
+  const dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+  const mean = px.reduce((s, p) => [s[0] + p[0], s[1] + p[1], s[2] + p[2]], [0, 0, 0]).map(v => v / px.length);
+  const cents = [mean];
+  while (cents.length < k) {
+    let best = null, bd = -1;
+    for (let i = 0; i < px.length; i += 7) { const d = Math.min(...cents.map(c => dist(px[i], c))); if (d > bd) { bd = d; best = px[i]; } }
+    if (!best || bd === 0) break;
+    cents.push([...best]);
+  }
+  let counts = [];
+  for (let it = 0; it < 12; it++) {
+    const sums = cents.map(() => [0, 0, 0]); counts = cents.map(() => 0);
+    for (const p of px) {
+      let j = 0, bd = Infinity;
+      cents.forEach((c, i) => { const d = dist(p, c); if (d < bd) { bd = d; j = i; } });
+      sums[j][0] += p[0]; sums[j][1] += p[1]; sums[j][2] += p[2]; counts[j]++;
+    }
+    cents.forEach((c, i) => { if (counts[i]) cents[i] = sums[i].map(v => v / counts[i]); });
+  }
+  return cents.map((rgb, i) => ({ rgb, share: counts[i] / px.length, hsl: rgb2hsl(rgb) }))
+    .filter(c => c.share >= 0.02).sort((a, b) => b.share - a.share);
+}
+function paletteFrom(cols, accentPick) {
+  // Base hue: the most common colourful colour (else the most common one).
+  const colourful = cols.filter(c => c.hsl[1] > 0.18 && c.hsl[2] > 0.08 && c.hsl[2] < 0.92);
+  const base = colourful[0] || cols[0];
+  // Background: the darkest substantial colour if it's already dark, else the base hue made deep.
+  const dark = cols.filter(c => c.share >= 0.08 && c.hsl[2] < 0.3).sort((a, b) => a.hsl[2] - b.hsl[2])[0];
+  // Greyscale artwork has no hue to work with: use a neutral slate and OnAir's default accent.
+  const grey = !colourful.length;
+  let [h, sat] = grey ? [228, 0.12] : (dark && dark.hsl[1] > 0.12 ? dark : base).hsl;
+  if (!grey) sat = Math.min(Math.max(sat, 0.25), 0.7);
+  let ink = hsl2rgb([h, sat, 0.14]);
+  for (let l = 0.14; contrast(ink, WHITE) < 12 && l > 0.04; l -= 0.01) ink = hsl2rgb([h, sat, l]);
+  const navy = hsl2rgb([h, Math.min(sat, 0.55), 0.3]);
+  // Accent: the chosen colour, or the most vivid one that differs from the background.
+  const vivid = accentPick || colourful.filter(c => contrast(c.rgb, ink) >= 2).sort((a, b) => (b.hsl[1] * Math.sqrt(b.share)) - (a.hsl[1] * Math.sqrt(a.share)))[0]
+             || colourful[0] || { hsl: rgb2hsl([0x3A, 0xCE, 0xA9]) };   // default accent (Midnight's mint)
+  let [ah, as, al] = vivid.hsl; as = Math.max(as, 0.35);
+  let accent = hsl2rgb([ah, as, al]);
+  for (let l = al; contrast(accent, ink) < 4.5 && l < 0.92; l += 0.02) accent = hsl2rgb([ah, as, l]);
+  let accentInk = hsl2rgb([ah, as, Math.min(al, 0.5)]);
+  for (let l = Math.min(al, 0.5); contrast(accentInk, PAPER) < 4.5 && l > 0.08; l -= 0.02) accentInk = hsl2rgb([ah, as, l]);
+  return { ink: hex(ink), navy: hex(navy), accent: hex(accent), accentInk: hex(accentInk) };
+}
+
+let genCols = [], genPick = null, genPalette = null;
+function renderGen() {
+  $("genOut").hidden = !genCols.length;
+  if (!genCols.length) return;
+  genPalette = paletteFrom(genCols, genPick);
+  $("dominant").innerHTML = genCols.map((c, i) =>
+    `<button type="button" data-i="${i}" aria-pressed="${genPick === c}" title="Use as the accent"><i style="background:${hex(c.rgb)}"></i>${Math.round(c.share * 100)}%</button>`).join("");
+  const p = genPalette;
+  $("mock").innerHTML = `<div class="mhead" style="background:${p.ink}">
+      <div class="row2"><span class="mtag" style="background:${p.navy}">On stage now</span></div>
+      <b>${esc(A.event?.name || "Your event")}</b>
+      <div class="mbar"><i style="background:${p.accent}"></i></div>
+      <div class="row2"><span class="mbtn" style="background:${p.accent};color:${p.ink}">Ask a question</span><span style="color:${p.accent};font:600 12px var(--mono)">12:30 · in 5 min</span></div>
+    </div><div class="mbody"><b style="color:${p.accentInk}">Act 1</b> &nbsp;Agenda text on the light page</div>`;
+  $("genSw").innerHTML = [["ink", "Background"], ["navy", "Secondary"], ["accent", "Accent"], ["accentInk", "Accent on light"]]
+    .map(([k, n]) => `<span><i style="background:${p[k]}"></i>${n} ${p[k]}</span>`).join("");
+}
+async function analyse(src, label) {
+  try {
+    $("dropText").textContent = `Analysing ${label}…`;
+    const px = await loadPixels(src);
+    genCols = dominantColours(px); genPick = null;
+    if (!genCols.length) throw new Error("no visible pixels");
+    $("imgPrev").src = src; $("imgPrev").hidden = false;
+    $("dropText").textContent = `${label} · ${genCols.length} dominant colours. Drop another image to try again.`;
+    renderGen();
+  } catch (e) {
+    $("dropText").textContent = "Drop an image here, or click to choose a file (PNG, JPG, SVG, WebP)";
+    toast(e?.name === "SecurityError" || /tainted|cross-origin/i.test(e?.message || "")
+      ? "That image's website doesn't allow reading its pixels. Download it and drop the file here instead."
+      : `Couldn't analyse the image (${e?.message || e}).`, true);
+  }
+}
+function analyseFile(file) {
+  if (!file || !file.type.startsWith("image/")) { toast("Choose an image file.", true); return; }
+  const reader = new FileReader();
+  reader.onload = () => analyse(reader.result, file.name);
+  reader.readAsDataURL(file);
+}
+$("imgFile").addEventListener("change", e => analyseFile(e.target.files[0]));
+$("drop").addEventListener("dragover", e => { e.preventDefault(); $("drop").classList.add("over"); });
+$("drop").addEventListener("dragleave", () => $("drop").classList.remove("over"));
+$("drop").addEventListener("drop", e => { e.preventDefault(); $("drop").classList.remove("over"); analyseFile(e.dataTransfer.files[0]); });
+$("fromLogo").addEventListener("click", () => A.event?.logo ? analyse(A.event.logo, "the event logo") : toast("Set a logo first (Branding → Logo).", true));
+$("dominant").addEventListener("click", e => {
+  const b = e.target.closest("[data-i]"); if (!b) return;
+  const c = genCols[+b.dataset.i]; genPick = genPick === c ? null : c; renderGen();
+});
+$("applyGen").addEventListener("click", () => {
+  if (!genPalette) return;
+  edit("Palette from an image", () => { A.theme = { preset: "custom", source: "image", ...genPalette }; return { noReflow: true }; });
+  toast("Palette applied. Screens on this computer update within seconds; Publish puts it online.");
+});
+$("brandSettings").addEventListener("change", e => {
+  const path = e.target.dataset.s; if (!path) return;
+  const v = e.target.value.trim(), keys = path.split(".");
+  if (path === "event.name" && !v) { toast("The event needs a name.", true); renderBranding(); return; }
+  edit(`Set ${path}`, () => {
+    let o = A; for (const k of keys.slice(0, -1)) o = o[k] ??= {};
+    const last = keys.at(-1);
+    if (v) o[last] = v; else delete o[last];          // empty = not set (e.g. no logo, no tag)
+    return { noReflow: true };
+  });
+});
 
 function renderSettings() {
   const g = $("settings");
@@ -428,6 +1092,30 @@ function renderSettings() {
     ${Object.entries(A.acts).map(([k, v]) => `<label>Act ${k}<input data-s="acts.${k}" value="${esc(v)}"></label>`).join("")}`;
 }
 
+// Decision panel: each move is enabled only when it applies; the small line says what it does, or when it becomes possible.
+function decisions(now, ci) {
+  const s = ci >= 0 ? S()[ci] : null, talk = s?.kind === "talk";
+  const qaFrom = talk ? end(s) - qaOf(s) : 0, inQa = talk && qaOf(s) > 0 && now >= qaFrom;
+  const canLend = lenders(now, -1).some(k => !cantTake(S()[k], DEDUCT, now));
+  return {
+    talk: !talk ? { off: "no talk on stage" } : inQa ? { off: "talk part is over" }
+      : qaFrom - now > EXTEND_FROM ? { off: `from ${f(qaFrom - EXTEND_FROM)}` }
+      : { i: ci, note: "then pick where from" },
+    qa: inQa ? { i: ci, note: "then pick where from" } : talk && qaOf(s) ? { off: `from ${f(qaFrom)}` } : { off: "no Q&A running" },
+    borrow: canLend ? { note: "pick a talk or break" } : { off: "nothing left to shorten" },
+  };
+}
+const DEC_LABELS = { talk: `+${EXTEND} min talk…`, qa: `+${EXTEND} min Q&A…`, borrow: `−${DEDUCT} min from…` };
+function renderDecisions(now, ci) {
+  const d = decisions(now, ci);
+  document.querySelectorAll("#dActs .dec").forEach(btn => {
+    const x = d[btn.dataset.dec];
+    btn.disabled = "off" in x; btn.dataset.i = x.i ?? "";
+    btn.querySelector("b").textContent = DEC_LABELS[btn.dataset.dec];
+    btn.querySelector("small").textContent = x.off ?? x.note;
+  });
+}
+
 function renderLive() {
   const { min, sec } = eventNow();
   $("clock").textContent = `${f(min)}:${pad(sec)}`;
@@ -440,10 +1128,14 @@ function renderLive() {
     $("nowLbl").textContent = s.kind === "break" ? "Break now" : "On stage now";
     $("nowLbl").className = "on";
     $("nowTitle").textContent = label(s);
-    $("nowMeta").textContent = `${s.start}–${f(end(s))} · ${Math.max(1, Math.ceil(end(s) - now))} min left`;
+    const qaFrom = end(s) - qaOf(s), inQa = s.kind === "talk" && qaOf(s) > 0 && now >= qaFrom;
+    $("nowMeta").textContent = `${s.start}–${f(end(s))} · ${Math.max(1, Math.ceil(end(s) - now))} min left`
+      + (s.kind !== "talk" || !qaOf(s) ? "" : inQa ? " · in Q&A" : ` · Q&A from ${f(qaFrom)}`);
     $("nowBar").style.width = ((now - m(s.start)) / s.dur * 100).toFixed(1) + "%";
     $("nowGo").disabled = false; $("nowGo").dataset.i = ci;
     $("nowGo").textContent = `Started late? Start it now (${f(min)})`;
+    $("dTag").textContent = inQa ? "Q&A now" : s.kind === "break" ? "Break now" : "On stage now";
+    $("dTag").className = inQa ? "qa" : s.kind === "break" ? "" : "on";
   } else {
     const between = ni > 0;
     $("nowLbl").textContent = ni === 0 ? "Before start" : ni < 0 ? "After the close" : "Changeover";
@@ -452,7 +1144,13 @@ function renderLive() {
     $("nowMeta").textContent = ni >= 0 ? `${label(S()[ni])} at ${S()[ni].start}` : "";
     $("nowBar").style.width = "0";
     $("nowGo").disabled = true; $("nowGo").textContent = "Started late? Start it now";
+    $("dTag").textContent = $("nowLbl").textContent; $("dTag").className = "";
   }
+  $("dClock").textContent = $("clock").textContent;
+  $("dTitle").textContent = $("nowTitle").textContent;
+  $("dMeta").textContent = $("nowMeta").textContent;
+  $("dBar").style.width = $("nowBar").style.width;
+  renderDecisions(now, ci);
   const n = ni >= 0 ? S()[ni] : null;
   $("nextTitle").textContent = n ? label(n) : "—";
   const diff = n ? Math.ceil(m(n.start) - now) : 0;
@@ -465,7 +1163,7 @@ function renderLive() {
     r.classList.toggle("next", i === ni);
     r.classList.toggle("past", now >= end(S()[i]));
   });
-  $("preview").href = "/";
+  updateOpenLinks();
 }
 
 /* ======================= events ======================= */
@@ -556,17 +1254,35 @@ document.querySelector(".tools").addEventListener("click", e => {
   list.lastElementChild?.querySelector(".title")?.select();
 });
 
-$("settings").addEventListener("change", e => {
+function onSettingChange(e) {
+  if (e.target.dataset.link) {
+    const v = e.target.value.trim();
+    if (v && !/^https?:\/\/\S+$/.test(v)) { toast("Links must start with http:// or https://", true); return; }
+    saveLinks({ [e.target.dataset.link]: v });
+    return;
+  }
   const path = e.target.dataset.s; if (!path) return;
   const [obj, key] = path.split(".");
   const v = e.target.type === "number" ? Math.max(0, +e.target.value || 0) : e.target.value;
   edit(`Set ${path}`, () => {
     if (obj === "acts") A.acts[key] = v;
+    else if (obj === "labels") { A.labels ??= {}; if (v.trim()) A.labels[key] = v.trim(); else delete A.labels[key]; }   // empty = default text
     else A[obj][key] = v;
-  });
-});
+  }, { rerender: obj !== "labels" });
+}
+$("settings").addEventListener("change", onSettingChange);
+$("linkSettings").addEventListener("change", onSettingChange);
 
 $("nowGo").addEventListener("click", e => startAt(+e.currentTarget.dataset.i, eventNow().min, { publish: true }));
+$("dActs").addEventListener("click", e => {
+  const btn = e.target.closest(".dec"); if (!btn || btn.disabled) return;
+  const k = btn.dataset.dec, i = +btn.dataset.i;
+  if (k === "talk" || k === "qa") openPick(i, k); else openPick(null);
+});
+$("pickRows").addEventListener("change", e => { const v = e.target.value; pick.j = v === "none" ? null : +v; renderPick(); });
+$("pickAmt").addEventListener("change", e => { pick.amount = +e.target.value; renderPick(); });
+$("pickApply").addEventListener("click", applyPick);
+$("dNow").addEventListener("click", () => scrollTo({ top: 0, behavior: "smooth" }));
 $("nextGo").addEventListener("click", e => startAt(+e.currentTarget.dataset.i, eventNow().min, { publish: true }));
 $("clearDelays").addEventListener("click", () => {
   if (!S().some((_, i) => slackOf(i))) return toast("No delays to clear.");
@@ -583,13 +1299,16 @@ addEventListener("keydown", e => {
 });
 
 $("pretend").addEventListener("change", e => {
-  if (!e.target.value) { clockOffsetMs = 0; $("realTime").hidden = true; return renderLive(); }
-  clockOffsetMs = 0;
-  const { min, sec } = eventNow();
-  clockOffsetMs = ((m(e.target.value) - min) * 60 - sec) * 1000;
-  $("realTime").hidden = false; renderLive();
+  if (!e.target.value) return realTime();
+  const t = Date.now(), { min, sec } = eventNow(t);
+  setMock(t + ((m(e.target.value) - min) * 60 - sec) * 1000, +$("speed").value);
 });
-$("realTime").addEventListener("click", () => { clockOffsetMs = 0; $("pretend").value = ""; $("realTime").hidden = true; renderLive(); });
+// Changing the speed carries on from the time shown; from real time it starts a pretend clock at "now".
+$("speed").addEventListener("change", e => {
+  const speed = +e.target.value;
+  if (mock || speed !== 1) setMock(nowMs(), speed);
+});
+$("realTime").addEventListener("click", realTime);
 
 addEventListener("beforeunload", e => { if (saveTimer || pending.length) { e.preventDefault(); e.returnValue = ""; } });
 
@@ -606,8 +1325,10 @@ addEventListener("beforeunload", e => { if (saveTimer || pending.length) { e.pre
   }
   A.timing.changeoverMinutes ??= 0; A.acts ??= {};
   synced = JSON.stringify(A);
+  try { ({ THEMES, resolveTheme } = await import("/themes.mjs")); } catch (e) { /* palettes unavailable: colour pickers still work */ }
   render();
-  setInterval(renderLive, 1000);
+  setInterval(renderLive, 250);   // fast enough for a sped-up pretend clock
+  renderScreens();
   setInterval(syncFromDisk, 3000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) syncFromDisk(); });
 })();

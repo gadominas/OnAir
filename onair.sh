@@ -161,7 +161,7 @@ stop() {
 status() {
   if pid="$(running_pid)"; then
     echo "${OK}●${RST} OnAir is running (PID $pid)."
-    [[ -f "$LOG_FILE" ]] && grep -E "^(OnAir admin|Live agenda|Stage screen|Speaker timer|Editing| {14})" "$LOG_FILE" || true
+    [[ -f "$LOG_FILE" ]] && grep -E "^(OnAir admin|Live agenda|Speaker timer|Editing| {14})" "$LOG_FILE" || true
   else
     echo "${DIM}○${RST} OnAir is not running."
     local owner; owner="$(port_owner "$PORT")"
@@ -193,7 +193,7 @@ banner() {
   \___/|_||_/_/ \_\_|_|
 ART
   printf '%s' "$RST"
-  echo "  ${DIM}live agenda · stage screen · speaker timer${RST}"
+  echo "  ${DIM}live agenda · presentation · speaker timer${RST}"
 }
 
 status_line() {
@@ -213,8 +213,8 @@ menu() {
     clear 2>/dev/null || printf '\n'
     banner; echo; status_line; echo
     printf '  %s1%s Start     %s2%s Stop      %s3%s Restart   %s4%s Status\n' "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST"
-    printf '  %s5%s Logs      %s6%s Admin     %s7%s Agenda    %s8%s Stage\n'  "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST"
-    printf '  %s9%s Timer     %sp%s Port      %ss%s Setup     %sq%s Quit\n'   "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST"
+    printf '  %s5%s Logs      %s6%s Admin     %s7%s Agenda    %s8%s Timer\n'  "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST"
+    printf '  %sp%s Port      %ss%s Setup     %sq%s Quit\n'   "$BOLD" "$RST" "$BOLD" "$RST" "$BOLD" "$RST"
     echo
     read -rsn1 -p "  Select › " key || exit 0
     echo "$key"; echo
@@ -227,8 +227,7 @@ menu() {
          trap ':' INT; ( trap - INT; logs ) || true; trap - INT ;;
       6) open_url "/admin/" ;;
       7) open_url "/" ;;
-      8) open_url "/stage.html" ;;
-      9) open_url "/timer.html" ;;
+      8) open_url "/timer.html" ;;
       p|P) local np; read -r -p "  New port (now $PORT): " np || true
            if [[ "$np" =~ ^[0-9]+$ ]] && (( np > 0 && np < 65536 )); then
              if running_pid >/dev/null; then echo "  OnAir is running on $PORT; stop it first, or restart after changing."; fi

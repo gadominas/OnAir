@@ -62,6 +62,9 @@ body.scrolled .mini.has{display:block}
 .pix i{width:5px;height:5px;background:var(--mint)}
 .pix i.d{opacity:.35}.pix i.o{opacity:0}
 .brand b{font-weight:700;font-size:15px;line-height:1.05;letter-spacing:-.01em}
+.brand .logo{height:30px;width:auto;max-width:140px;object-fit:contain;display:block}
+.presLogo{display:none}
+body.present .presLogo{display:block;height:clamp(28px,4.4vh,64px);width:auto;max-width:20vw;object-fit:contain;margin-right:auto}
 .brand b span{color:var(--mint)}
 .top .actions{margin-left:auto;display:flex;gap:8px}
 .btn{display:inline-flex;align-items:center;gap:0;font:600 14px/1 var(--sans);text-decoration:none;
@@ -74,7 +77,18 @@ body.scrolled .mini.has{display:block}
   .brand b{font-size:13px}
   .btn{padding:10px 11px;font-size:13px}
   .btn .long{display:none}
+  .top .actions .wide-only{display:none}   /* phones: "watch live" is in the hero's link bar */
 }
+/* link bar in the hero: watch live, ask a question */
+.linkbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.linkbar a{display:inline-flex;align-items:center;gap:9px;padding:12px 16px;border-radius:12px;font:600 15px/1.1 var(--sans);
+  text-decoration:none;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2)}
+.linkbar a:hover{background:rgba(255,255,255,.14)}
+.linkbar a.primary{background:var(--mint);color:var(--ink);border-color:var(--mint)}
+.linkbar a.primary:hover{filter:brightness(1.06)}
+.linkbar .dot{width:9px;height:9px;border-radius:50%;background:var(--live);animation:pulse 1.6s ease-in-out infinite}
+.linkbar .ic{font-size:16px;line-height:1}
+@media (max-width:640px){.linkbar a{flex:1 1 auto;justify-content:center}}
 
 /* ---------- test banner ---------- */
 .simbar{display:none;background:#FFF4D6;color:#5A3E00;border-bottom:1px solid #F0D58A;font-size:14px}
@@ -111,7 +125,7 @@ body.scrolled .mini.has{display:block}
 .bar .fill{position:absolute;inset:0 auto 0 0;background:var(--mint);border-radius:6px}
 .bar .qa{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.28) 0 4px,transparent 4px 8px)}
 .barmeta{display:flex;justify-content:space-between;font:500 13px var(--mono);color:#C9CBE8}
-.qanow{display:none;margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(58,206,169,.14);border:1px solid rgba(58,206,169,.5)}
+.qanow{display:none;margin-top:16px;padding:14px 16px;border-radius:12px;background:color-mix(in srgb, var(--mint) 14%, transparent);border:1px solid color-mix(in srgb, var(--mint) 50%, transparent)}
 .qanow.on{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .qanow p{margin:0;font-weight:600}
 .next{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 18px}
@@ -193,26 +207,10 @@ dialog::backdrop{background:rgba(15,15,70,.45)}
 .row .spacer{flex:1}
 
 
-/* ---------- Slido dialog ---------- */
-dialog.slido{width:min(720px,96vw);height:min(860px,92vh);max-height:none}
-dialog.slido .sl{display:flex;flex-direction:column;height:100%}
-.slhead{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--ink);color:#fff}
-.slhead b{font-size:16px;margin-right:auto}
-.slhead a,.slhead button{font:600 13px var(--sans);border-radius:9px;padding:8px 11px;cursor:pointer;text-decoration:none}
-.slhead a{background:var(--mint);color:var(--ink);border:0}
-.slhead button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
-.slbody{position:relative;flex:1;background:#fff}
-.slbody iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.slnote{margin:0;padding:8px 14px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);background:var(--paper)}
-@media (max-width:640px){
-  dialog.slido{width:100vw;height:100dvh;max-width:none;border-radius:0;margin:0}
-  .slhead{padding-top:calc(12px + env(safe-area-inset-top,0px))}
-  .slnote{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
-}
-
 /* ---------- presentation mode (shared screen) ---------- */
 .presTop{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
 .presClock,.presQr,.presUp,.presCtl{display:none}
+body.present .linkbar{display:none}
 body.present{background:var(--ink);overflow:hidden;height:100vh;height:100dvh;display:flex;flex-direction:column}
 body.present header.top,body.present main,body.present footer,body.present .jump{display:none!important}
 body.present .hero{flex:1;min-height:0;padding:3.2vh 0 3vh;border-bottom:0;display:flex}
@@ -272,7 +270,8 @@ body.present.nocursor{cursor:none}
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#" aria-label="Back to top">
-      <span class="pix" aria-hidden="true">
+      <img class="logo" id="logo" alt="" hidden>
+      <span class="pix" id="pix" aria-hidden="true">
         <i></i><i class="d"></i><i></i><i class="o"></i>
         <i class="d"></i><i></i><i></i><i class="d"></i>
         <i class="o"></i><i></i><i class="d"></i><i></i>
@@ -280,8 +279,8 @@ body.present.nocursor{cursor:none}
       <b>&nbsp;</b>
     </a>
     <div class="actions">
-      <a class="btn qa slido-link" id="qaTop" target="_blank" rel="noopener">Ask a question</a>
-      <a class="btn stream" id="streamTop" target="_blank" rel="noopener"><span class="dot"></span>Watch<span class="long">&nbsp;the livestream</span></a>
+      <a class="btn qa" id="qaTop" target="_blank" rel="noopener">Ask a question</a>
+      <a class="btn stream wide-only" id="streamTop" target="_blank" rel="noopener"><span class="dot"></span><span class="lbl">Watch live</span></a>
       <button class="btn stream present-btn" id="presentTop" type="button" title="Show on a shared screen (P)">Present<span class="long">&nbsp;on screen</span></button>
     </div>
   </div>
@@ -306,6 +305,7 @@ body.present.nocursor{cursor:none}
   <div class="wrap">
     <div class="presTop">
       <div class="prompt" id="prompt" aria-hidden="true"><div class="ln" id="cliL1">&gt; <span class="cur"></span></div><div class="ln" id="cliL2"></div></div>
+      <img class="presLogo" id="presLogo" alt="" hidden>
       <div class="presClock" id="presClock" aria-label="Current event time"></div>
     </div>
     <div class="stage"><div class="stageMain">
@@ -334,7 +334,7 @@ body.present.nocursor{cursor:none}
           <div class="barmeta"><span id="nowRange"></span><span id="nowLeft"></span></div>
           <div class="qanow" id="qaNow">
             <p>Q&amp;A is open. Send your question now.</p>
-            <a class="btn qa slido-link" id="qaHero" target="_blank" rel="noopener">Ask a question</a>
+            <a class="btn qa" id="qaHero" target="_blank" rel="noopener">Ask a question</a>
           </div>
         </div>
         <aside class="next" id="nextBox">
@@ -353,10 +353,11 @@ body.present.nocursor{cursor:none}
     </div>
     <aside class="presQr" aria-label="Ask a question">
       <div class="qrTile" id="qrTile"></div>
-      <b>Scan to ask a question</b>
+      <b id="qrTitle">Scan to ask a question</b>
       <span id="qrNote">Q&amp;A open all day</span>
     </aside>
     </div>
+    <nav class="linkbar" id="linkBar" aria-label="Event links" hidden></nav>
     <ol class="presUp" id="presUp" aria-label="Coming up"></ol>
   </div>
 </section>
@@ -411,23 +412,12 @@ body.present.nocursor{cursor:none}
   </form>
 </dialog>
 
-<dialog class="slido" id="slidoDlg" aria-labelledby="slidoTitle">
-  <div class="sl">
-    <div class="slhead">
-      <b id="slidoTitle">Ask a question</b>
-      <a id="slidoNewTab" target="_blank" rel="noopener">Open in new tab</a>
-      <button type="button" id="slidoClose" aria-label="Close Q&amp;A">Close</button>
-    </div>
-    <div class="slbody"><iframe id="slidoFrame" title="Q&amp;A" allow="clipboard-write" loading="lazy"></iframe></div>
-    <p class="slnote">If it doesn't load here, use “Open in new tab”.</p>
-  </div>
-</dialog>
-
 <script type="module">
 /* ======================= configuration ======================= */
 // The agenda is agenda.json next to this page, so it comes from whichever host serves the page
 // (the local admin server, GitHub Pages, any static host). ?agenda=<url> loads a different one.
 import qrcode from "./vendor/qrcode.mjs";
+import { applyTheme } from "./themes.mjs";
 const AGENDA_URL = new URLSearchParams(location.search).get("agenda") || "agenda.json";
 const QUIET = new URLSearchParams(location.search).has("quiet");
 // Adds a throwaway query parameter so neither the browser nor the GitHub Pages CDN serves a stale copy.
@@ -452,11 +442,11 @@ try {
 // These are reassigned by applyAgenda() whenever the agenda file changes.
 // start = "HH:MM" local event time, dur in minutes. Talks have a Q&A tail.
 let EV, LINKS, TALK, QA, ACTS, SESSIONS, LABELS, CLI, DATE0_UTC, EVENT_OFFSET_MIN, EVENT_START, EVENT_END;
-// Optional colours from agenda.json: { "ink", "navy", "accent", "accentInk" } (any CSS colour).
-function applyTheme(t = {}) {
-  const map = { ink: "--ink", navy: "--navy", accent: "--mint", accentInk: "--mint-ink" };
-  for (const [k, v] of Object.entries(map)) t[k] ? document.documentElement.style.setProperty(v, t[k]) : document.documentElement.style.removeProperty(v);
-}
+// Button and caption texts; agenda.json "labels" overrides any of them (e.g. for another language).
+const LABEL_DEFAULTS = { act: "Act", ask: "Ask a question", watch: "Watch live",
+  qrTitle: "Scan to ask a question", qrNote: "Q&A open all day" };
+const label = k => LABELS?.[k] || LABEL_DEFAULTS[k];
+// Colours: agenda.json "theme" ({ "preset": "midnight" | "ocean" | …, plus optional single colours}), see themes.mjs.
 
 /* ======================= time model ======================= */
 const toMin = hhmm => { const [h,m] = hhmm.split(":").map(Number); return h*60+m; };
@@ -511,7 +501,7 @@ SESSIONS.forEach((s, i) => {
   if (s.act && s.act !== lastAct) {
     const h = document.createElement("div");
     h.className = "act"; h.dataset.act = s.act;
-    h.innerHTML = `<span class="tag">${esc(LABELS.act ?? "Act")} ${s.act}</span><h3>${esc(ACTS[s.act] ?? "")}</h3>`;
+    h.innerHTML = `<span class="tag">${esc(label("act"))} ${s.act}</span><h3>${esc(ACTS[s.act] ?? "")}</h3>`;
     list.appendChild(h);
     lastAct = s.act;
   }
@@ -520,7 +510,7 @@ SESSIONS.forEach((s, i) => {
   el.id = "s" + i;
   const len = qaMin(s) ? `${s.dur - qaMin(s)} min + ${qaMin(s)} min Q&amp;A` : `${s.dur} min`;
   const by = s.who ? `<p class="by"><b>${esc(s.who)}</b>${s.role ? ` <span>${esc(s.role)}</span>` : ""}</p>` : "";
-  const ask = s.kind === "talk" && LINKS.qa ? `<a class="ask slido-link" href="${esc(LINKS.qa)}" target="_blank" rel="noopener">Ask a question</a>` : "<span></span>";
+  const ask = s.kind === "talk" && LINKS.qa ? `<a class="ask" href="${esc(LINKS.qa)}" target="_blank" rel="noopener">${esc(label("ask"))}</a>` : "<span></span>";
   el.innerHTML = `
     <div><div class="t">${hhmm(s.from)}–${hhmm(s.to)}</div><div class="len">${len}</div></div>
     <div>
@@ -534,16 +524,26 @@ SESSIONS.forEach((s, i) => {
   list.appendChild(el);
 });
 
-// Links are optional: without one, its buttons (and the QR code) are hidden.
-["qaTop", "qaHero"].forEach(id => { $(id).hidden = !LINKS.qa; if (LINKS.qa) $(id).href = LINKS.qa; });
+// Links are optional: without one, its buttons are hidden.
+["qaTop", "qaHero"].forEach(id => { $(id).hidden = !LINKS.qa; if (LINKS.qa) { $(id).href = LINKS.qa; $(id).textContent = label("ask"); } });
 $("streamTop").hidden = !LINKS.stream;
-if (LINKS.stream) $("streamTop").href = LINKS.stream;
-renderQr(LINKS.qrUrl || LINKS.qa);
+if (LINKS.stream) { $("streamTop").href = LINKS.stream; $("streamTop").querySelector(".lbl").textContent = label("watch"); }
+renderLinkBar();
+// Presentation-mode QR code for the Q&A link. Its caption comes from labels.qrTitle / qrNote.
+renderQr(LINKS.qa);
+$("qrTitle").textContent = label("qrTitle");
+$("qrNote").textContent = label("qrNote");
 
 // Event text from the agenda file.
 const doors = hhmm(EVENT_START);
 document.title = `${EV.name} · Live agenda`;
 const brand = EV.brand || { title: EV.name };
+// Optional logo (event.logo: an image URL or a path next to the pages) replaces the pixel mark.
+for (const id of ["logo", "presLogo"]) {
+  $(id).hidden = !EV.logo;
+  if (EV.logo && $(id).getAttribute("src") !== EV.logo) { $(id).src = EV.logo; $(id).alt = EV.name; }
+}
+$("pix").hidden = !!EV.logo;
 document.querySelector(".brand").setAttribute("aria-label", `${brand.title}, back to top`);
 document.querySelector(".brand b").innerHTML = `${esc(brand.title)}${brand.number ? ` <span>${esc(brand.number)}</span>` : ""}${EV.city ? `<br>${esc(EV.city)}` : ""}`;
 $("presClock").setAttribute("aria-label", `Current ${EV.city} time`);
@@ -558,7 +558,16 @@ $("tRange").setAttribute("aria-label", `Simulated time of day, ${EV.city}`);
 // Show the start in the viewer's own time zone if it differs from the event's.
 const localOffset = -new Date(EVENT_START).getTimezoneOffset();
 $("localNote").textContent = localOffset !== EVENT_OFFSET_MIN ? `That is ${localFmt.format(new Date(EVENT_START))} where you are.` : "";
-if (LINKS.qa) $("slidoNewTab").href = LINKS.qa;
+}
+
+// Big buttons in the hero for the event's links (watch live, ask a question).
+function renderLinkBar() {
+  const items = [
+    LINKS.stream && `<a href="${esc(LINKS.stream)}" target="_blank" rel="noopener"><span class="dot"></span>${esc(label("watch"))}</a>`,
+    LINKS.qa && `<a class="primary" href="${esc(LINKS.qa)}" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">💬</span>${esc(label("ask"))}</a>`,
+  ].filter(Boolean);
+  $("linkBar").innerHTML = items.join("");
+  $("linkBar").hidden = !items.length;
 }
 
 // "Scan to ask" QR code for presentation mode, generated from the Q&A link (hidden without one).
@@ -847,111 +856,59 @@ function renderPresentation(t, ci, ni) {
   if ($("presUp").dataset.k !== html) { $("presUp").innerHTML = html; $("presUp").dataset.k = html; }
 }
 
-/* ======================= Slido dialog ======================= */
-const slidoDlg = $("slidoDlg");
-function openSlido(context) {
-  const f = $("slidoFrame");
-  if (!f.src) f.src = LINKS.qa;          // load once, keep the session alive between opens
-  $("slidoTitle").textContent = context ? `Ask a question · ${context}` : "Ask a question";
-  slidoDlg.showModal();
-}
-document.addEventListener("click", e => {
-  const a = e.target.closest("a.slido-link");
-  if (!a) return;
-  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let people force a new tab
-  e.preventDefault();
-  const card = a.closest(".s");
-  const title = card ? card.querySelector("h4")?.textContent : (a.id === "qaHero" ? $("nowTitle").textContent : "");
-  openSlido(title);
-});
-$("slidoClose").addEventListener("click", () => slidoDlg.close());
-$("slidoNewTab").addEventListener("click", () => slidoDlg.close());
-slidoDlg.addEventListener("click", e => { if (e.target === slidoDlg) slidoDlg.close(); }); // click on backdrop closes
-
 if (new URLSearchParams(location.search).get("mode") === "present") setMode(true, false);
 tick(true);
 setInterval(() => tick(false), 250);
 
 /* ======================= CLI loop ======================= */
-// The hero's prompt plays a little terminal scene on repeat: it types a command, "corrects" its argument a few
-// times before landing on the real one, boots the event, shows what's on air, and exits. Decorative only.
-// Configured by the agenda's optional "cli" block (see README); every field has a default:
-//   command  "onair --city"        typed first
-//   answer   event city, lowercase  the final argument
-//   guesses  []                     arguments typed and erased before the answer
-//   jokes    true                   one joke command per loop (true = built-in list, an array = yours, false = none)
-//   exitCode 0                      printed as "exit <code>" at the end
-//   enabled  true                   false shows a static prompt
+// The hero's two-line terminal. Configured by the agenda's optional "cli" block (see README); every field has a default.
+//
+// Between talks (changeovers, breaks, before and after the event) it loops a little scene: it types the init
+// command (correcting its argument a few times), initializes the next talk, runs ONE funny command from the
+// inventory (cli-commands.json), and exits with code 42. When a talk starts, it "runs" the talk and then keeps
+// the talk and presenter on screen with a status line that warns as the talk nears its end and announces the Q&A.
 const cliConf = () => ({
   command: CLI.command ?? "onair --city",
   answer: CLI.answer ?? (EV.city || "").toLowerCase(),
   guesses: Array.isArray(CLI.guesses) ? CLI.guesses : [],
-  jokes: CLI.jokes === false ? [] : Array.isArray(CLI.jokes) ? CLI.jokes : CLI_JOKES,
-  exitCode: CLI.exitCode ?? 0,
+  jokes: CLI.jokes === false ? [] : Array.isArray(CLI.jokes) ? CLI.jokes : CLI_INVENTORY,
+  exitCode: CLI.exitCode ?? 42,
   enabled: CLI.enabled !== false,
 });
-// Built-in jokes: one runs as the last init step of each loop, right before the exit code. There are 42 of them.
-const CLI_JOKES = [
-  "sudo make coffee --double-shot",
-  "git blame --someone-else",
-  "npm install patience --save-dev",
-  "docker run --rm impostor-syndrome",
-  "kubectl delete pod monday",
-  "rm -rf legacy/ --dry-run",
-  "ping questions --ask-nicely",
-  "ssh speaker@stage 'ready?'",
-  "grep -r 'meaning of life' .",
-  "chmod +x hype",
-  "curl -X POST /api/applause",
-  "terraform apply --auto-approve-snacks",
-  "crontab -e '0 13 * * * lunch'",
-  "llm --prompt 'write my talk' --temperature 0",
-  "tokens --burn=less --think=more",
-  "git commit -m 'fixed it for real this time'",
-  "git push --force-with-hope",
-  "mvn clean install --skip-coffee-break",
-  "export WIFI_PASSWORD=ask_at_the_desk",
-  "tail -f questions.log",
-  "top --sort=enthusiasm",
-  "kill -9 small-talk",
-  "systemctl restart projector",
-  "apt-get install more-chairs",
-  "git checkout -b plan-b",
-  "git stash pop --excuses",
-  "brew install espresso",
-  "./configure --with-clicker --without-cables",
-  "nslookup the-answer  # 42",
-  "ulimit -n infinite-questions",
-  "pip install --upgrade slides",
-  "mkdir -p ~/.ideas/after-this-talk",
-  "history | grep 'it worked yesterday'",
-  "date --vibes=good",
-  "echo 'hello, world' > /dev/stage",
-  "unzip lunch.zip --wait 13:00",
-  "make demo DEMO_GODS=friendly",
-  "ln -s coffee fuel",
-  "watch -n 1 stage_clock",
-  "git rebase -i --keep-the-good-parts",
-  "yes 'one more question' | head -1",
-  "find / -name 'keys' -mtime -1",
-];
+// The inventory: 42 funny commands, each { "cmd", "out" }, in cli-commands.json next to this page.
+const CLI_INVENTORY = [];   // filled in place once loaded, so settings read earlier still see it
+fetch(bust("cli-commands.json"), { cache: "no-store" }).then(r => r.ok ? r.json() : []).then(list => {
+  CLI_INVENTORY.push(...(Array.isArray(list) ? list : []).filter(x => typeof x === "string" || x?.cmd));
+}).catch(() => {});
 let lastJoke = -1;
 function pickJoke(list) {
   if (!list.length) return null;
   let i;
   do i = Math.floor(Math.random() * list.length); while (i === lastJoke && list.length > 1);
   lastJoke = i;
-  return list[i];
+  const j = list[i];
+  return typeof j === "string" ? { cmd: j, out: "ok ✓" } : { cmd: j.cmd, out: j.out ?? "ok ✓" };
 }
-function onAirLine() {
-  const t = now(), ci = currentIndex(t), ni = nextIndex(t);
-  if (t < EVENT_START) return `first up ${hhmm(SESSIONS[0].from)}: ${SESSIONS[0].title}`;
-  if (t >= EVENT_END) return `that's a wrap.${EV.city ? " thank you, " + EV.city.toLowerCase() : " thank you!"}`;
-  if (ci >= 0) {
-    const s = SESSIONS[ci];
-    return s.kind === "break" ? `${s.title.toLowerCase()} until ${hhmm(s.to)}` : `on air: ${s.title}${s.who ? " — " + s.who : ""}`;
+const who = s => s.who ? ` — ${s.who}` : "";
+// What the break scene initializes: the next talk (or the first, or a goodbye).
+function nextLine() {
+  const t = now(), ni = nextIndex(t);
+  if (t < EVENT_START) return `first up ${hhmm(SESSIONS[0].from)}: ${SESSIONS[0].title}${who(SESSIONS[0])}`;
+  if (ni < 0) return `that's a wrap.${EV.city ? " thank you, " + EV.city.toLowerCase() : " thank you!"}`;
+  const n = SESSIONS[ni];
+  return `up next ${hhmm(n.from)}: ${n.title}${n.kind !== "break" ? who(n) : ""} (in ${minsLeft(n.from - t)} min)`;
+}
+// The status line under the talk while it's on stage.
+function talkStatus(s, t) {
+  const qa = qaMin(s) > 0, qaAt = qaStart(s);
+  if (qa && t >= qaAt) {
+    const left = s.to - t;
+    return left <= 60000 ? "💬 last minute of Q&A" : `💬 Q&A is open · ${minsLeft(left)} min left · ${label("ask").toLowerCase()}`;
   }
-  return `up next ${hhmm(SESSIONS[ni].from)}: ${SESSIONS[ni].title}`;
+  const left = (qa ? qaAt : s.to) - t, m = minsLeft(left);
+  if (left <= 60000) return qa ? "⏳ last minute · Q&A next" : "⏳ last minute · wrapping up";
+  if (left <= 5 * 60000) return qa ? `⏳ ${m} min left · then Q&A` : `⏳ ${m} min left · wrapping up`;
+  return `🎤 on stage · ${m} min left${qa ? " · Q&A after" : ""}`;
 }
 (async function cliLoop() {
   const L = [$("cliL1"), $("cliL2")];
@@ -966,45 +923,65 @@ function onAirLine() {
     });
   };
   const full = c => [c.command, c.answer].filter(Boolean).join(" ");
-  if (reduced || !cliConf().enabled) { lines = [{ text: full(cliConf()) }]; draw(); return; }
-  // While someone is on stage (a talk, its Q&A, or a keynote) the terminal goes quiet: no typing, no jokes,
-  // just the command and what's on air. The scene picks up again in breaks, changeovers and before/after.
-  const onStage = () => { const ci = currentIndex(now()); return ci >= 0 && SESSIONS[ci].kind !== "break"; };
+  const onStageIdx = () => { const ci = currentIndex(now()); return ci >= 0 && SESSIONS[ci].kind !== "break" ? ci : -1; };
   const HUSH = Symbol("hush");
-  const sleep = ms => new Promise(r => setTimeout(r, ms)).then(() => { if (onStage()) throw HUSH; });
-  const type = async txt => { for (const ch of txt) { lines.at(-1).text += ch; draw(); await sleep(45 + Math.random() * 95); } };
+  const pause = ms => new Promise(r => setTimeout(r, ms));
+  let guard = false;           // in the break scene, every step bails out as soon as a talk starts
+  const sleep = ms => pause(ms).then(() => { if (guard && onStageIdx() >= 0) throw HUSH; });
+  const type = async (txt, speed = 1) => { for (const ch of txt) { lines.at(-1).text += ch; draw(); await sleep((45 + Math.random() * 95) / speed); } };
   const erase = async n => { for (let i = 0; i < n; i++) { lines.at(-1).text = lines.at(-1).text.slice(0, -1); draw(); await sleep(38); } };
   const print = async (text, ms) => { lines.push({ text, out: true }); draw(); await sleep(ms); };
-  const hush = async () => {
-    while (onStage()) {
-      lines = [{ text: full(cliConf()) }, { text: onAirLine(), out: true }]; draw();
-      await new Promise(r => setTimeout(r, 1000));
+
+  if (reduced || !cliConf().enabled) {
+    // No animation: a static prompt, plus the talk while one is on.
+    for (;;) {
+      const i = onStageIdx(), t = now();
+      lines = i >= 0 ? [{ text: `▶ ${SESSIONS[i].title}${who(SESSIONS[i])}`, out: true }, { text: talkStatus(SESSIONS[i], t), out: true }]
+                     : [{ text: full(cliConf()) }];
+      draw(); await pause(1000);
     }
-  };
-  for (;;) {
-    try { await scene(); }
-    catch (e) { if (e !== HUSH) throw e; }
-    await hush();
   }
-  async function scene() {
-    if (onStage()) throw HUSH;
+
+  // Break scene: init → next talk → one funny command → exit 42. Bails out (HUSH) when a talk starts.
+  async function breakScene() {
     const c = cliConf();                                           // re-read: the agenda may have changed
     lines = [{ text: "" }]; draw();
     await sleep(700);
     await type(c.command ? c.command + " " : "");
-    for (const wrong of c.guesses) {
-      await type(wrong); await sleep(650);
-      await erase(wrong.length); await sleep(260);
-    }
+    for (const wrong of c.guesses) { await type(wrong); await sleep(650); await erase(wrong.length); await sleep(260); }
     await type(c.answer); await sleep(650);
-    await print("initializing event…", 900);                       // ⏎
-    await print(`loading agenda… ${SESSIONS.length} sessions ✓`, 1100);
-    await print(onAirLine(), 4200);
-    const joke = pickJoke(c.jokes);
-    if (joke) await print(`${joke} ✓`, 2400);
+    await print("initializing next talk… ✓", 1000);                // ⏎
+    await print(nextLine(), 2600);
+    const joke = pickJoke(cliConf().jokes);                        // picked now, so the inventory has loaded
+    if (joke) {
+      lines.push({ text: "" }); draw(); await sleep(400);
+      await type(joke.cmd); await sleep(450);
+      await print(joke.out, 2600);
+    }
     await print(`exit ${c.exitCode}`, 2200);                       // the run's exit code
     lines.push({ text: "" }); draw();                              // back to an empty prompt
     await sleep(900);
+  }
+
+  // Talk scene: load and run the talk, then keep its title, presenter and status on screen until it ends.
+  async function talkScene(i) {
+    const s = SESSIONS[i];
+    lines.push({ text: "" }); draw();
+    await type(`onair run "${s.title}"`, 2.2);
+    await pause(300);
+    lines.push({ text: `loading talk… ✓${s.who ? " presenter: " + s.who : ""}`, out: true }); draw();
+    await pause(1200);
+    while (onStageIdx() === i && SESSIONS[i] === s) {
+      lines = [{ text: `▶ ${s.title}${who(s)}`, out: true }, { text: talkStatus(s, now()), out: true }];
+      draw(); await pause(1000);
+    }
+  }
+
+  for (;;) {
+    const i = onStageIdx();
+    if (i >= 0) { guard = false; await talkScene(i); continue; }
+    guard = true;
+    try { await breakScene(); } catch (e) { if (e !== HUSH) throw e; }
   }
 })();
 

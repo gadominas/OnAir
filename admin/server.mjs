@@ -26,9 +26,10 @@ const REMOTE = process.env.REMOTE || "origin";
 const PUBLIC = {
   "/": ["index.html", "text/html"],
   "/index.html": ["index.html", "text/html"],
-  "/stage.html": ["stage.html", "text/html"],
   "/timer.html": ["timer.html", "text/html"],
   "/vendor/qrcode.mjs": ["vendor/qrcode.mjs", "text/javascript"],
+  "/themes.mjs": ["themes.mjs", "text/javascript"],
+  "/cli-commands.json": ["cli-commands.json", "application/json"],
 };
 
 const branch = async () => process.env.BRANCH || await git("rev-parse", "--abbrev-ref", "HEAD");
@@ -51,6 +52,8 @@ function validate(a) {
     if (!s.title) errs.push(`Session ${i + 1}: title is required.`);
     if (s.qa !== undefined && (!Number.isFinite(s.qa) || s.qa < 0 || s.qa > s.dur)) errs.push(`Session ${i + 1}: qa must be between 0 and dur.`);
   });
+  if (a.event?.logo !== undefined && (typeof a.event.logo !== "string" || /^\s*(javascript|vbscript):/i.test(a.event.logo))) errs.push("event.logo must be an image URL or path.");
+  if (!a.event?.name) errs.push("event.name is required.");
   return errs;
 }
 
@@ -97,8 +100,8 @@ const server = createServer(async (req, res) => {
     }
     if (req.method === "PUT" && url.pathname === "/api/agenda") {
       const agenda = JSON.parse(await readBody(req));
-      // The admin page never edits links (Slido, livestream), so keep the ones on disk. An admin tab left open
-      // across a link change would otherwise write its stale links back.
+      // Links have their own route (PUT /api/links), so a general save keeps the ones on disk. An admin tab left
+      // open across a link change would otherwise write its stale links back.
       try { agenda.links = JSON.parse(await readFile(AGENDA, "utf8")).links ?? agenda.links; } catch (e) {}
       const errs = validate(agenda);
       if (errs.length) return send(res, 422, { error: errs.join(" ") });
@@ -106,6 +109,23 @@ const server = createServer(async (req, res) => {
       await writeFile(tmp, JSON.stringify(agenda, null, 2) + "\n");
       await rename(tmp, AGENDA); // atomic: the file is never half-written
       return send(res, 200, { ok: true, savedAt: new Date().toISOString() });
+    }
+    // Links are only changed here, deliberately (the admin's Links settings), never by a general save.
+    if (req.method === "PUT" && url.pathname === "/api/links") {
+      const { links } = JSON.parse(await readBody(req));
+      const KEYS = ["qa", "stream"];   // one Q&A link (buttons, QR code) and the livestream
+      if (!links || typeof links !== "object") return send(res, 422, { error: "Expected { links: { … } }." });
+      for (const [k, v] of Object.entries(links)) {
+        if (!KEYS.includes(k)) return send(res, 422, { error: `Unknown link "${k}". Known: ${KEYS.join(", ")}.` });
+        if (typeof v !== "string" || (v && !/^https?:\/\/\S+$/.test(v))) return send(res, 422, { error: `${k} must be empty or an http(s) URL.` });
+      }
+      const agenda = JSON.parse(await readFile(AGENDA, "utf8"));
+      agenda.links = { ...(agenda.links || {}), ...links };
+      for (const old of ["qr", "qrUrl", "wall"]) delete agenda.links[old];   // older separate links: the Q&A link covers them now
+      const tmp = AGENDA + ".tmp";
+      await writeFile(tmp, JSON.stringify(agenda, null, 2) + "\n");
+      await rename(tmp, AGENDA);
+      return send(res, 200, { ok: true, links: agenda.links });
     }
     if (req.method === "POST" && url.pathname === "/api/publish") {
       const { message } = JSON.parse((await readBody(req)) || "{}");
@@ -128,6 +148,10 @@ const server = createServer(async (req, res) => {
       publishing = run.catch(() => {});
       return send(res, 200, await run);
     }
+    // Where other devices can reach the public pages (for the admin's Screens panel).
+    if (req.method === "GET" && url.pathname === "/api/addresses") {
+      return send(res, 200, { port: server.address().port, lan: lanAddresses() });
+    }
     if (req.method === "GET" && url.pathname === "/api/status") {
       const br = await branch().catch(() => null);
       if (!br) return send(res, 200, { git: false });
@@ -141,13 +165,15 @@ const server = createServer(async (req, res) => {
   }
 });
 
+// Addresses other devices on the network can use (none when listening on loopback only).
+const lanAddresses = () => HOST === "127.0.0.1" || HOST === "localhost" ? [] : Object.values(networkInterfaces()).flat()
+  .filter(i => i && i.family === "IPv4" && !i.internal).map(i => i.address);
+
 server.listen(PORT, HOST, () => {
-  // Addresses other devices on the network can use (only when listening beyond loopback).
-  const lan = HOST === "127.0.0.1" || HOST === "localhost" ? [] : Object.values(networkInterfaces()).flat()
-    .filter(i => i && i.family === "IPv4" && !i.internal).map(i => i.address);
+  const lan = lanAddresses();
   const base = [`localhost:${PORT}`, ...lan.map(a => `${a}:${PORT}`)];
   console.log(`OnAir admin:   http://localhost:${PORT}/admin/   (this machine only)`);
-  for (const [label, page] of [["Live agenda:  ", ""], ["Stage screen: ", "stage.html"], ["Speaker timer:", "timer.html"]]) {
+  for (const [label, page] of [["Live agenda:  ", ""], ["Speaker timer:", "timer.html"]]) {
     base.forEach((b, i) => console.log(`${i ? " ".repeat(14) : label} http://${b}/${page}`));
   }
   console.log(`Editing:       ${AGENDA}`);

@@ -5,7 +5,7 @@ Rules for people and AI agents editing an OnAir agenda (`agenda.json`) or the On
 ## Layout
 
 - `agenda.json`: the single source of truth for the event: details, links, theme, timing, acts and sessions.
-- `index.html`, `stage.html`, `timer.html`: static pages that fetch `agenda.json` from the host serving them.
+- `index.html`, `timer.html`: static pages that fetch `agenda.json` from the host serving them.
   `?agenda=<url>` overrides the source.
 - `admin/`: the local admin and server (`node admin/server.mjs`). It edits `agenda.json` and can publish it with git.
 - `docs/IMPLEMENTATION.md`: architecture and implementation notes. Keep it in sync with behaviour changes.
@@ -49,9 +49,11 @@ daylight saving on that day.
 
 ## Links
 
-`links.qa`, `links.wall` and `links.stream` are optional; an empty link hides its buttons and panels. The admin never
-edits links, and the local server keeps the links from the file on disk when the admin saves, so change them in
-`agenda.json` directly. `links.wall` must be a page that allows embedding (for Slido, `https://app.sli.do/event/<id>`).
+`links.qa` and `links.stream` are optional; an empty link hides its buttons and panels. `links.qa` is the one Q&A
+link: the Ask buttons (which open it in a new tab) and the presentation-mode QR code use it (for Slido, the audience link
+`https://app.sli.do/event/<id>`). Change links in `agenda.json` or in the admin's "Links & QR code"
+panel, which saves them through `PUT /api/links`; a general admin save always keeps the links on disk, so a stale admin
+tab can't overwrite them.
 
 ## Check before committing
 
@@ -69,4 +71,6 @@ console.log("checked",a.sessions.length,"sessions")'
 ## Previewing
 
 Run `node admin/server.mjs` and open http://localhost:4242/. Add `?sim=14:50` (any page) to see it as it would
-look at that time on the event day, and `&speed=10` to run the clock faster.
+look at that time on the event day, and `&speed=10` to run the clock faster. In the admin, "Pretend it's" and the speed next to it
+(up to 300×, or paused) do the same, and the screens it opens follow that time and speed. "Start now" uses the pretend
+time, so go back to real time before using it on the day.

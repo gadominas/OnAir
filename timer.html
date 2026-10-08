@@ -24,7 +24,7 @@ body.nocursor{cursor:none}
 /* top: what's on */
 .top{display:flex;align-items:center;gap:1.4vw;min-width:0}
 .chip{flex:none;font:700 clamp(14px,2.6vh,34px) var(--mono);letter-spacing:.06em;padding:.3em .8em;border-radius:.5em;background:rgba(255,255,255,.1);color:var(--soft)}
-.chip.talk{background:rgba(58,206,169,.16);color:var(--mint)}
+.chip.talk{background:color-mix(in srgb, var(--mint) 16%, transparent);color:var(--mint)}
 .chip.qa{background:rgba(120,140,255,.2);color:#B9C3FF}
 .what{min-width:0;flex:1}
 .what b{display:block;font-size:clamp(16px,3.4vh,44px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -110,6 +110,7 @@ body.calm{--digits:var(--mint)}
 // ?sim=HH:MM&speed=60 rehearses a time. Agenda changes (e.g. "Start now" in the admin) are picked up
 // every few seconds without reloading.
 const q = new URLSearchParams(location.search);
+import { applyTheme } from "./themes.mjs";
 const AGENDA_URL = q.get("agenda") || "agenda.json";
 const ALERTS = [5, 2, 1];          // minutes left that trigger a warning
 const BANNER_MS = 8000;            // how long the "N MIN LEFT" banner shows after a threshold
@@ -140,8 +141,7 @@ function setData(a) {
   EVENT_START = SESSIONS[0].from; EVENT_END = SESSIONS.at(-1).to;
   fmt = new Intl.DateTimeFormat("en-GB", { timeZone: EV.timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
   document.title = `${EV.name} · Speaker timer`;
-  // Optional accent colour from agenda.json "theme" (used for the talk chip, calm states and "next").
-  a.theme?.accent ? document.documentElement.style.setProperty("--mint", a.theme.accent) : document.documentElement.style.removeProperty("--mint");
+  applyTheme(a.theme);   // the accent colours the talk chip, calm states and "next"
 }
 try {
   const got = await fetchAgenda();
