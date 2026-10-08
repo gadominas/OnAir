@@ -1,32 +1,32 @@
 {
   "event": {
-    "name": "Demo",
+    "name": "The Big Reveal",
     "brand": {
       "title": "OnAir",
-      "number": "Demo"
+      "number": "The Big Reveal"
     },
-    "city": "Riga",
+    "city": "Vilnius",
     "date": "2026-10-08",
     "timeZone": "Europe/Lisbon",
     "utcOffset": "+01:00",
     "timeZoneNote": "Lisbon time (WEST, UTC+1)",
     "venue": "Example Hall, Rua do Exemplo 42, Lisbon.",
     "dateText": "Thursday 20 May 2027",
-    "organizer": "Your Organisation"
+    "organizer": "Your Organisation",
+    "logo": "https://www.eisgroup.com/wp-content/uploads/2024/01/EIS-logo-only-white.svg"
   },
   "links": {
     "qa": "https://google.com",
     "stream": "https://google.com",
-    "qr": "https://delfi.lt",
-    "wall": "https://delfi.lt"
+    "qr": "https://delfi.lt"
   },
   "theme": {
     "preset": "custom",
     "source": "image",
-    "ink": "#2D1F1B",
-    "navy": "#604239",
-    "accent": "#43968E",
-    "accentInk": "#377A74"
+    "ink": "#1F2128",
+    "navy": "#434756",
+    "accent": "#3ACEA9",
+    "accentInk": "#1E7B64"
   },
   "labels": {
     "act": "Act",
@@ -76,7 +76,7 @@
     },
     {
       "start": "10:01",
-      "dur": 42,
+      "dur": 47,
       "kind": "talk",
       "act": 1,
       "title": "Docs That Write Back",
@@ -85,13 +85,13 @@
       "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong."
     },
     {
-      "start": "10:55",
+      "start": "11:09",
       "dur": 10,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "11:05",
+      "start": "11:19",
       "dur": 42,
       "kind": "talk",
       "act": 2,
@@ -101,17 +101,7 @@
       "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
     },
     {
-      "start": "11:52",
-      "dur": 42,
-      "kind": "talk",
-      "act": 2,
-      "title": "Postmortems Without the Blame",
-      "who": "Hana Sato",
-      "role": "Incident Manager",
-      "desc": "Running incident reviews people actually want to attend, with a template you can steal on the way out."
-    },
-    {
-      "start": "12:39",
+      "start": "12:06",
       "dur": 20,
       "kind": "talk",
       "act": 2,
@@ -122,13 +112,13 @@
       "qa": 5
     },
     {
-      "start": "12:59",
+      "start": "13:14",
       "dur": 50,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "13:49",
+      "start": "14:04",
       "dur": 42,
       "kind": "talk",
       "act": 3,
@@ -138,7 +128,7 @@
       "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
     },
     {
-      "start": "14:36",
+      "start": "14:51",
       "dur": 42,
       "kind": "talk",
       "act": 3,
@@ -148,7 +138,7 @@
       "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
     },
     {
-      "start": "15:23",
+      "start": "15:38",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
