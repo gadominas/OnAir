@@ -66,17 +66,17 @@
     },
     {
       "start": "09:14",
-      "dur": 97,
+      "dur": 102,
       "kind": "talk",
       "act": 1,
       "title": "Docs That Write Back",
       "who": "Aiko Brandt",
       "role": "Developer Experience",
       "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong.",
-      "qa": 57
+      "qa": 62
     },
     {
-      "start": "10:56",
+      "start": "11:01",
       "dur": 42,
       "kind": "talk",
       "act": 1,
@@ -87,14 +87,14 @@
       "qa": 12
     },
     {
-      "start": "11:38",
+      "start": "11:43",
       "dur": 5,
       "kind": "break",
       "title": "Coffee break"
     },
     {
-      "start": "11:43",
-      "dur": 15,
+      "start": "11:48",
+      "dur": 10,
       "kind": "talk",
       "act": 2,
       "title": "Lightning: Feature Flags Gone Wild",
