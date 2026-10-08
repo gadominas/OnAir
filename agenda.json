@@ -124,12 +124,12 @@
     },
     {
       "start": "13:13",
-      "dur": 35,
+      "dur": 30,
       "kind": "break",
       "title": "Lunch"
     },
     {
-      "start": "13:48",
+      "start": "13:43",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
@@ -137,7 +137,7 @@
       "role": "Host"
     },
     {
-      "start": "13:58",
+      "start": "13:53",
       "dur": 57,
       "kind": "talk",
       "act": 2,
