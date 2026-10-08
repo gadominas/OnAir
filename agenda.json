@@ -130,22 +130,22 @@
       "title": "Lunch"
     },
     {
-      "start": "14:34",
-      "dur": 42,
-      "kind": "talk",
-      "act": 3,
-      "title": "The Boring Architecture Manifesto",
-      "who": "Felix Aaltonen",
-      "role": "Principal Engineer",
-      "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
-    },
-    {
-      "start": "15:21",
+      "start": "14:22",
       "dur": 10,
       "kind": "keynote",
       "title": "Closing notes",
       "who": "Rita Moreno-Lind",
       "role": "Host"
+    },
+    {
+      "start": "14:32",
+      "dur": 47,
+      "kind": "talk",
+      "act": 2,
+      "title": "The Boring Architecture Manifesto",
+      "who": "Felix Aaltonen",
+      "role": "Principal Engineer",
+      "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
     }
   ]
 }
