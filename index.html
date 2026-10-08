@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Live agenda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Theme defaults; agenda.json "theme" overrides ink, navy, accent (mint) and accentInk (mint-ink). */
+  --ink:#0F0F46;        /* deep background */
+  --navy:#2A2A72;       /* secondary */
+  --mint:#3ACEA9;       /* accent */
+  --mint-ink:#0E7A5E;   /* accent readable on light backgrounds */
+  --paper:#F5F6FA;
+  --card:#FFFFFF;
+  --line:#E3E5EF;
+  --text:#14163F;
+  --muted:#5D6088;
+  --live:#E5484D;       /* terminal red dot */
+  --a1:#0E7A5E; --a1bg:#E7F8F2;
+  --a2:#2F5BD3; --a2bg:#EAF0FD;
+  --a3:#7A3FD0; --a3bg:#F3ECFD;
+  --a4:#B4610A; --a4bg:#FDF2E3;
+  --sans:'Spline Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-padding-top:160px}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.5;
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--mint);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+/* ---------- header ---------- */
+header.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;
+  padding-top:env(safe-area-inset-top,0px)}
+header.top > .wrap{display:flex;align-items:center;gap:16px;height:64px}
+/* compact live strip: pinned under the header once the hero scrolls away */
+.mini{display:none;border-top:1px solid rgba(255,255,255,.1);box-shadow:0 6px 18px rgba(15,15,70,.18)}
+body.scrolled .mini.has{display:block}
+.mini .wrap{padding-top:8px;padding-bottom:9px}
+.mini .r1{display:flex;align-items:center;gap:10px;font-size:15px}
+.mini .lbl{flex:none;display:inline-flex;align-items:center;gap:6px;font:600 12px var(--mono);color:#FFB3B5}
+.mini .lbl i{width:7px;height:7px;border-radius:50%;background:var(--live);animation:pulse 1.6s ease-in-out infinite}
+.mini .lbl.calm{color:var(--mint)}.mini .lbl.calm i{background:var(--mint);animation:none}
+.mini .ttl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.mini .left{flex:none;font:500 13px var(--mono);color:var(--mint);font-variant-numeric:tabular-nums}
+.mini .mbar{position:relative;height:5px;background:rgba(255,255,255,.14);border-radius:3px;margin:7px 0 6px;overflow:hidden}
+.mini .mbar[hidden]{display:none}
+.mini .mbar b{position:absolute;inset:0 auto 0 0;background:var(--mint);border-radius:3px}
+.mini .mbar u{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.28) 0 3px,transparent 3px 6px)}
+.mini .r2{font-size:13px;color:#C9CBE8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini .r2 span{font:600 12px var(--mono);color:var(--mint);margin-right:6px}
+.mini .r2:empty{display:none}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.pix{display:grid;grid-template-columns:repeat(4,5px);gap:2px}
+.pix i{width:5px;height:5px;background:var(--mint)}
+.pix i.d{opacity:.35}.pix i.o{opacity:0}
+.brand b{font-weight:700;font-size:15px;line-height:1.05;letter-spacing:-.01em}
+.brand b span{color:var(--mint)}
+.top .actions{margin-left:auto;display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:0;font:600 14px/1 var(--sans);text-decoration:none;
+  padding:11px 14px;border-radius:10px;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn.qa{background:var(--mint);color:var(--ink)}
+.btn.stream{background:transparent;color:#fff;border-color:rgba(255,255,255,.28)}
+.btn.stream .dot{width:8px;height:8px;border-radius:50%;background:var(--live);margin-right:8px}
+.btn:hover{filter:brightness(1.06)}
+@media (max-width:640px){
+  .brand b{font-size:13px}
+  .btn{padding:10px 11px;font-size:13px}
+  .btn .long{display:none}
+}
+
+/* ---------- test banner ---------- */
+.simbar{display:none;background:#FFF4D6;color:#5A3E00;border-bottom:1px solid #F0D58A;font-size:14px}
+.simbar.on{display:block}
+.simbar .wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.simbar button{font:600 13px var(--sans);background:#5A3E00;color:#fff;border:0;border-radius:8px;padding:6px 10px;cursor:pointer}
+
+/* ---------- status hero ---------- */
+.hero{background:var(--ink);color:#fff;padding:36px 0 40px;border-bottom:4px solid var(--mint)}
+.prompt{font-family:var(--mono);font-size:14px;color:var(--mint);margin:0 0 14px;min-width:0;flex:1}
+/* two-line terminal: fixed height so the typing loop never shifts the layout */
+.prompt .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.5em;line-height:1.5}
+.prompt .ln.out{color:#C9CBE8}
+.prompt .cur{display:inline-block;width:.6em;height:1.05em;background:var(--mint);vertical-align:-.15em;margin-left:4px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.05;letter-spacing:-.02em;margin:0 0 8px;font-weight:700}
+.hero .where{color:#C9CBE8;margin:0;font-size:15px}
+.hero .local{color:#9FA3D6;font-size:13px;margin-top:4px}
+
+.count{display:flex;gap:clamp(10px,3vw,28px);margin:28px 0 6px;flex-wrap:wrap}
+.count div{min-width:84px}
+.count strong{display:block;font:600 clamp(48px,11vw,96px)/.95 var(--mono);color:var(--mint);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.count span{display:block;font-size:14px;color:#C9CBE8;margin-top:6px}
+
+.live{display:grid;grid-template-columns:1fr minmax(240px,320px);gap:28px;margin-top:22px;align-items:start}
+@media (max-width:820px){.live{grid-template-columns:1fr}}
+.onair{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--mono);color:#fff;background:rgba(229,72,77,.18);
+  border:1px solid rgba(229,72,77,.5);padding:5px 10px;border-radius:999px}
+.onair i{width:8px;height:8px;border-radius:50%;background:var(--live);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.live h2{font-size:clamp(24px,4vw,34px);line-height:1.12;margin:14px 0 6px;letter-spacing:-.015em}
+.live .who{color:#C9CBE8;margin:0}
+.bar{position:relative;height:10px;background:rgba(255,255,255,.12);border-radius:6px;margin:22px 0 8px;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;background:var(--mint);border-radius:6px}
+.bar .qa{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.28) 0 4px,transparent 4px 8px)}
+.barmeta{display:flex;justify-content:space-between;font:500 13px var(--mono);color:#C9CBE8}
+.qanow{display:none;margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(58,206,169,.14);border:1px solid rgba(58,206,169,.5)}
+.qanow.on{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.qanow p{margin:0;font-weight:600}
+.next{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 18px}
+.next small{display:block;color:#9FA3D6;font-size:13px;margin-bottom:6px}
+.next b{display:block;font-size:17px;line-height:1.25}
+.next .when{font:500 13px var(--mono);color:var(--mint);margin-top:8px}
+
+/* ---------- agenda ---------- */
+main{padding:32px 0 80px}
+.tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.tools h2{margin:0;font-size:24px;letter-spacing:-.01em}
+.tools .tz{color:var(--muted);font-size:14px}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{width:18px;height:18px;accent-color:var(--mint-ink)}
+
+.act{display:flex;align-items:baseline;gap:12px;margin:34px 0 12px}
+.act .tag{font:600 13px var(--mono);padding:4px 10px;border-radius:7px;color:var(--navy);background:#EEF0FA}
+.act h3{margin:0;font-size:19px;letter-spacing:-.01em}
+.act[data-act="1"] .tag{color:var(--a1);background:var(--a1bg)}
+.act[data-act="2"] .tag{color:var(--a2);background:var(--a2bg)}
+.act[data-act="3"] .tag{color:var(--a3);background:var(--a3bg)}
+.act[data-act="4"] .tag{color:var(--a4);background:var(--a4bg)}
+
+.list{position:relative}
+.s{position:relative;display:grid;grid-template-columns:132px 1fr auto;gap:18px;align-items:start;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:10px}
+.s.brk{background:transparent;border-style:dashed}
+.s .t{font:600 16px var(--mono);font-variant-numeric:tabular-nums;color:var(--text)}
+.s .len{font:500 12px var(--mono);color:var(--muted);margin-top:4px}
+.s h4{margin:0;font-size:18px;line-height:1.3;letter-spacing:-.01em}
+.s .p{margin:6px 0 0;color:var(--muted);font-size:15px;max-width:68ch}
+.s .by{margin:10px 0 0;font-size:14px}
+.s .by b{font-weight:600}
+.s .by span{color:var(--muted)}
+.s .ask{font:600 13px var(--sans);text-decoration:none;color:var(--mint-ink);border:1px solid #BFEBDD;background:#F0FBF7;
+  padding:8px 11px;border-radius:9px;white-space:nowrap}
+.s .state{display:none}
+@media (max-width:700px){
+  .s{grid-template-columns:1fr;gap:8px;padding:16px}
+  .s .ask{justify-self:start}
+}
+
+/* past / now / next */
+.s.past{opacity:.55}
+.s.past .t::after{content:" ✓";color:var(--mint-ink)}
+.s.now{border:2px solid var(--mint);box-shadow:0 8px 28px rgba(15,15,70,.10)}
+.s.now .state,.s.soon .state{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--mono);
+  padding:3px 8px;border-radius:999px;margin-bottom:8px}
+.s.now .state{background:#FDECEC;color:#B4232A}
+.s.now .state i{width:7px;height:7px;border-radius:50%;background:var(--live);animation:pulse 1.6s ease-in-out infinite}
+.s.soon .state{background:#EEF0FA;color:var(--navy)}
+.s .prog{display:none;position:absolute;left:0;right:0;bottom:-2px;height:4px;border-radius:0 0 14px 14px;overflow:hidden}
+.s.now .prog{display:block}
+.s .prog i{display:block;height:100%;background:var(--mint)}
+
+.jump{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:15;display:none;
+  background:var(--ink);color:#fff;border:0;border-radius:999px;padding:12px 16px;font:600 14px var(--sans);
+  box-shadow:0 8px 24px rgba(15,15,70,.3);cursor:pointer}
+.jump.on{display:inline-flex;gap:8px;align-items:center}
+.jump i{width:8px;height:8px;border-radius:50%;background:var(--live)}
+
+/* ---------- test panel ---------- */
+footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.linkbtn{background:none;border:0;color:var(--navy);font:600 14px var(--sans);text-decoration:underline;cursor:pointer;padding:0}
+dialog{border:0;border-radius:16px;padding:0;width:min(560px,94vw);box-shadow:0 24px 60px rgba(15,15,70,.35)}
+dialog::backdrop{background:rgba(15,15,70,.45)}
+.panel{padding:22px}
+.panel h3{margin:0 0 4px;font-size:20px}
+.panel p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.panel .clock{font:600 28px var(--mono);margin:6px 0 10px}
+.panel input[type=range]{width:100%;accent-color:var(--mint-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chips button,.row button,.row select{font:600 13px var(--sans);border:1px solid var(--line);background:#fff;color:var(--text);
+  border-radius:9px;padding:8px 10px;cursor:pointer}
+.chips button:hover{border-color:var(--mint)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.row .primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.row .spacer{flex:1}
+
+
+/* ---------- Slido dialog ---------- */
+dialog.slido{width:min(720px,96vw);height:min(860px,92vh);max-height:none}
+dialog.slido .sl{display:flex;flex-direction:column;height:100%}
+.slhead{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--ink);color:#fff}
+.slhead b{font-size:16px;margin-right:auto}
+.slhead a,.slhead button{font:600 13px var(--sans);border-radius:9px;padding:8px 11px;cursor:pointer;text-decoration:none}
+.slhead a{background:var(--mint);color:var(--ink);border:0}
+.slhead button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
+.slbody{position:relative;flex:1;background:#fff}
+.slbody iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.slnote{margin:0;padding:8px 14px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);background:var(--paper)}
+@media (max-width:640px){
+  dialog.slido{width:100vw;height:100dvh;max-width:none;border-radius:0;margin:0}
+  .slhead{padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .slnote{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+}
+
+/* ---------- presentation mode (shared screen) ---------- */
+.presTop{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.presClock,.presQr,.presUp,.presCtl{display:none}
+body.present{background:var(--ink);overflow:hidden;height:100vh;height:100dvh;display:flex;flex-direction:column}
+body.present header.top,body.present main,body.present footer,body.present .jump{display:none!important}
+body.present .hero{flex:1;min-height:0;padding:3.2vh 0 3vh;border-bottom:0;display:flex}
+body.present .hero .wrap{max-width:none;width:100%;padding:0 4vw;display:flex;flex-direction:column}
+body.present .prompt{font-size:clamp(14px,1.5vw,26px);margin:0}
+body.present .presClock{display:block;font:600 clamp(20px,2.6vw,48px)/1 var(--mono);color:#fff;font-variant-numeric:tabular-nums}
+body.present .stage{flex:1;display:grid;grid-template-columns:1fr auto;gap:4vw;align-items:center;margin-top:2vh}
+body.present .presQr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.2vh}
+body.present .qrTile{width:min(30vw,56vh);aspect-ratio:1;background:#fff;border-radius:18px;padding:0}
+body.present .qrTile svg{display:block;width:100%;height:100%;border-radius:18px}
+body.present .presQr b{font-size:clamp(18px,2.2vw,40px);line-height:1.15}
+body.present .presQr span{color:#C9CBE8;font-size:clamp(13px,1.2vw,22px)}
+body.present .hero h1{font-size:clamp(28px,3.8vw,72px)}
+body.present .count strong{font-size:clamp(48px,8.5vw,170px)}
+body.present .count span{font-size:clamp(13px,1.2vw,22px)}
+body.present .count{gap:2.6vw}
+body.present .count div{min-width:0}
+body.present .hero .where{font-size:clamp(14px,1.35vw,24px);max-width:60ch}
+body.present .hero .local{display:none}
+body.present .live{grid-template-columns:1fr;gap:3vh;margin-top:0}
+body.present .onair{font-size:clamp(13px,1.2vw,22px);padding:.4em .9em}
+body.present .live h2{font-size:clamp(30px,4.4vw,84px);line-height:1.05}
+body.present .live .who{font-size:clamp(16px,1.8vw,32px)}
+body.present .bar{height:clamp(10px,1.2vh,18px);margin-top:3vh}
+body.present .barmeta{font-size:clamp(13px,1.2vw,22px)}
+body.present .qanow{display:none!important}
+body.present .next{padding:2vh 1.6vw}
+body.present .next small{font-size:clamp(12px,1vw,18px)}
+body.present .next b{font-size:clamp(18px,2vw,36px)}
+body.present .next .when{font-size:clamp(13px,1.1vw,20px)}
+body.present .presUp{display:flex;gap:1.2vw;list-style:none;margin:2.6vh 0 0;padding:2vh 0 0;border-top:1px solid rgba(255,255,255,.15)}
+body.present .presUp li{flex:1;min-width:0}
+body.present .presUp .t{font:600 clamp(12px,1.1vw,20px) var(--mono);color:var(--mint)}
+body.present .presUp .n{font-size:clamp(13px,1.15vw,21px);line-height:1.3;color:#fff;margin-top:.4vh;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+body.present .presUp .w{font-size:clamp(11px,.95vw,17px);color:#9FA3D6;margin-top:.2vh}
+body.present .presUp:empty{display:none}
+body.present.qa-live .presQr b::after{content:" — Q&A is open now";color:var(--mint)}
+body.present .presCtl{display:flex;position:fixed;right:18px;bottom:18px;gap:8px;z-index:30;opacity:0;transition:opacity .3s}
+body.present .presCtl.show,body.present .presCtl:focus-within{opacity:1}
+.presCtl button{font:600 14px var(--sans);background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);
+  border-radius:10px;padding:10px 14px;cursor:pointer}
+body.present.nocursor{cursor:none}
+@media (max-aspect-ratio:1/1){
+  body.present .stage{grid-template-columns:1fr}
+  body.present .qrTile{width:min(60vw,36vh)}
+}
+.present-btn{font:600 14px/1 var(--sans)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Back to top">
+      <span class="pix" aria-hidden="true">
+        <i></i><i class="d"></i><i></i><i class="o"></i>
+        <i class="d"></i><i></i><i></i><i class="d"></i>
+        <i class="o"></i><i></i><i class="d"></i><i></i>
+      </span>
+      <b>&nbsp;</b>
+    </a>
+    <div class="actions">
+      <a class="btn qa slido-link" id="qaTop" target="_blank" rel="noopener">Ask a question</a>
+      <a class="btn stream" id="streamTop" target="_blank" rel="noopener"><span class="dot"></span>Watch<span class="long">&nbsp;the livestream</span></a>
+      <button class="btn stream present-btn" id="presentTop" type="button" title="Show on a shared screen (P)">Present<span class="long">&nbsp;on screen</span></button>
+    </div>
+  </div>
+  <div class="mini" id="mini" aria-hidden="true">
+    <div class="wrap">
+      <div class="r1"><span class="lbl" id="mLbl"><i></i><span id="mLblT"></span></span><span class="ttl" id="mTitle"></span><span class="left" id="mLeft"></span></div>
+      <div class="mbar" id="mBar"><b id="mFill"></b><u id="mQa"></u></div>
+      <div class="r2" id="mNext"></div>
+    </div>
+  </div>
+</header>
+
+<div class="simbar" id="simbar" role="status">
+  <div class="wrap">
+    <span id="simtext">Test mode</span>
+    <button type="button" id="simEdit">Change time</button>
+    <button type="button" id="simExit">Back to real time</button>
+  </div>
+</div>
+
+<section class="hero" aria-live="polite">
+  <div class="wrap">
+    <div class="presTop">
+      <div class="prompt" id="prompt" aria-hidden="true"><div class="ln" id="cliL1">&gt; <span class="cur"></span></div><div class="ln" id="cliL2"></div></div>
+      <div class="presClock" id="presClock" aria-label="Current event time"></div>
+    </div>
+    <div class="stage"><div class="stageMain">
+
+    <!-- before the event -->
+    <div id="vBefore">
+      <h1>Starts in</h1>
+      <div class="count" id="count">
+        <div><strong id="cD">00</strong><span>days</span></div>
+        <div><strong id="cH">00</strong><span>hours</span></div>
+        <div><strong id="cM">00</strong><span>minutes</span></div>
+        <div><strong id="cS">00</strong><span>seconds</span></div>
+      </div>
+      <p class="where"></p>
+      <p class="local" id="localNote"></p>
+    </div>
+
+    <!-- during the event -->
+    <div id="vLive" hidden>
+      <div class="live">
+        <div>
+          <span class="onair" id="liveBadge"><i></i><span id="liveLabel">On stage now</span></span>
+          <h2 id="nowTitle"></h2>
+          <p class="who" id="nowWho"></p>
+          <div class="bar" aria-hidden="true"><div class="fill" id="nowFill"></div><div class="qa" id="nowQa"></div></div>
+          <div class="barmeta"><span id="nowRange"></span><span id="nowLeft"></span></div>
+          <div class="qanow" id="qaNow">
+            <p>Q&amp;A is open. Send your question now.</p>
+            <a class="btn qa slido-link" id="qaHero" target="_blank" rel="noopener">Ask a question</a>
+          </div>
+        </div>
+        <aside class="next" id="nextBox">
+          <small>Up next</small>
+          <b id="nextTitle"></b>
+          <div class="when" id="nextWhen"></div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- after the event -->
+    <div id="vAfter" hidden>
+      <h1>That's a wrap.</h1>
+      <p class="where"></p>
+    </div>
+    </div>
+    <aside class="presQr" aria-label="Ask a question">
+      <div class="qrTile" id="qrTile"></div>
+      <b>Scan to ask a question</b>
+      <span id="qrNote">Q&amp;A open all day</span>
+    </aside>
+    </div>
+    <ol class="presUp" id="presUp" aria-label="Coming up"></ol>
+  </div>
+</section>
+
+<div class="presCtl" id="presCtl">
+  <button type="button" id="presFull">Full screen</button>
+  <button type="button" id="presExit">Back to participant view</button>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="tools">
+      <div>
+        <h2>Agenda</h2>
+        <div class="tz"></div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="follow" checked> Follow the live session</label>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+</main>
+
+<button class="jump" id="jump" type="button"><i></i>Jump to now</button>
+
+<footer>
+  <div class="wrap">
+    <span></span>
+    <span><button class="linkbtn" id="presentFoot" type="button">Presentation mode for a shared screen</button> &nbsp; <button class="linkbtn" id="openTest" type="button">Test the live view before the event</button></span>
+  </div>
+</footer>
+
+<dialog id="testDlg" aria-labelledby="testTitle">
+  <form method="dialog" class="panel">
+    <h3 id="testTitle">Test the live view</h3>
+    <p>Pick any moment and the page behaves as if it were that time. Nothing changes for anyone else.</p>
+    <div class="clock" id="tClock">09:00</div>
+    <input type="range" id="tRange" min="0" max="600" step="1" aria-label="Simulated time of day">
+    <div class="chips" id="tChips"></div>
+    <div class="row">
+      <label for="tSpeed" style="font-size:14px;color:var(--muted)">Clock speed</label>
+      <select id="tSpeed">
+        <option value="1">Real speed</option>
+        <option value="10">10× faster</option>
+        <option value="60">1 minute per second</option>
+        <option value="300">5 minutes per second</option>
+      </select>
+      <button type="button" id="tPlay">Pause clock</button>
+      <span class="spacer"></span>
+      <button type="button" id="tExit">Back to real time</button>
+      <button class="primary" value="close">Done</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="slido" id="slidoDlg" aria-labelledby="slidoTitle">
+  <div class="sl">
+    <div class="slhead">
+      <b id="slidoTitle">Ask a question</b>
+      <a id="slidoNewTab" target="_blank" rel="noopener">Open in new tab</a>
+      <button type="button" id="slidoClose" aria-label="Close Q&amp;A">Close</button>
+    </div>
+    <div class="slbody"><iframe id="slidoFrame" title="Q&amp;A" allow="clipboard-write" loading="lazy"></iframe></div>
+    <p class="slnote">If it doesn't load here, use “Open in new tab”.</p>
+  </div>
+</dialog>
+
+<script type="module">
+/* ======================= configuration ======================= */
+// The agenda is agenda.json next to this page, so it comes from whichever host serves the page
+// (the local admin server, GitHub Pages, any static host). ?agenda=<url> loads a different one.
+import qrcode from "./vendor/qrcode.mjs";
+const AGENDA_URL = new URLSearchParams(location.search).get("agenda") || "agenda.json";
+const QUIET = new URLSearchParams(location.search).has("quiet");
+// Adds a throwaway query parameter so neither the browser nor the GitHub Pages CDN serves a stale copy.
+const bust = u => { const x = new URL(u, location.href); x.searchParams.set("_", Date.now()); return x.href; };
+async function fetchAgenda() {
+  const r = await fetch(bust(AGENDA_URL), { cache: "no-store" });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const text = await r.text();
+  return { text, data: JSON.parse(text) };
+}
+let AGENDA, agendaText;
+try {
+  ({ text: agendaText, data: AGENDA } = await fetchAgenda());
+} catch (e) {
+  document.querySelector(".hero .wrap").innerHTML =
+    `<h1>Agenda unavailable</h1><p class="where">Couldn't load <code>${String(AGENDA_URL).replace(/[&<>"]/g, "")}</code> (${String(e.message || e).replace(/[&<>"]/g, "")}). ` +
+    (location.protocol === "file:" ? `Pages opened straight from disk can't load it: serve the folder instead, e.g. <code>node admin/server.mjs</code>.</p>`
+                                   : `Check your connection and reload the page.</p>`);
+  throw e;
+}
+
+// These are reassigned by applyAgenda() whenever the agenda file changes.
+// start = "HH:MM" local event time, dur in minutes. Talks have a Q&A tail.
+let EV, LINKS, TALK, QA, ACTS, SESSIONS, LABELS, CLI, DATE0_UTC, EVENT_OFFSET_MIN, EVENT_START, EVENT_END;
+// Optional colours from agenda.json: { "ink", "navy", "accent", "accentInk" } (any CSS colour).
+function applyTheme(t = {}) {
+  const map = { ink: "--ink", navy: "--navy", accent: "--mint", accentInk: "--mint-ink" };
+  for (const [k, v] of Object.entries(map)) t[k] ? document.documentElement.style.setProperty(v, t[k]) : document.documentElement.style.removeProperty(v);
+}
+
+/* ======================= time model ======================= */
+const toMin = hhmm => { const [h,m] = hhmm.split(":").map(Number); return h*60+m; };
+function setData(a) {
+  EV = a.event; LINKS = a.links || {}; ACTS = a.acts || {}; SESSIONS = a.sessions; LABELS = a.labels || {}; CLI = a.cli || {};
+  applyTheme(a.theme);
+  TALK = a.timing.talkMinutes; QA = a.timing.qaMinutes;
+  // Midnight of the event day as a UTC instant, from the event date and its UTC offset on that day.
+  DATE0_UTC = Date.parse(`${EV.date}T00:00:00${EV.utcOffset}`);
+  EVENT_OFFSET_MIN = (([, sg, h, m]) => (sg === "-" ? -1 : 1) * (+h * 60 + +m))(EV.utcOffset.match(/([+-])(\d{2}):(\d{2})/));
+  SESSIONS.forEach(s => {
+    s.from = DATE0_UTC + toMin(s.start) * 60000;
+    s.to = s.from + s.dur * 60000;
+  });
+  EVENT_START = SESSIONS[0].from;
+  EVENT_END = SESSIONS[SESSIONS.length - 1].to;
+}
+// Per-talk Q&A: a talk's "qa" minutes (default timing.qaMinutes) come at the end of its slot; the talk part is the rest.
+const qaMin = s => s.kind === "talk" ? Math.max(0, Math.min(s.dur, s.qa ?? QA)) : 0;
+const qaStart = s => s.to - qaMin(s) * 60000;
+const inQaAt = (s, t) => qaMin(s) > 0 && t >= qaStart(s);
+
+setData(AGENDA);
+
+const evFmt = new Intl.DateTimeFormat("en-GB", { timeZone:EV.timeZone, hour:"2-digit", minute:"2-digit" });
+const localFmt = new Intl.DateTimeFormat(undefined, { hour:"2-digit", minute:"2-digit", timeZoneName:"short" });
+const evDayFmt = new Intl.DateTimeFormat("en-GB", { timeZone:EV.timeZone, weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+const hhmm = ms => evFmt.format(new Date(ms));
+
+// Simulated clock for test mode. null = real time.
+let sim = null; // { base: ms, anchor: performance.now(), speed: n, playing: bool }
+function now() {
+  if (!sim) return Date.now();
+  return sim.playing ? sim.base + (performance.now() - sim.anchor) * sim.speed : sim.base;
+}
+function setSim(ms, speed, playing) {
+  sim = { base: ms, anchor: performance.now(), speed: speed ?? (sim ? sim.speed : 1), playing: playing ?? true };
+  lastCurrent = undefined;
+  tick(true);
+}
+function rebaseSim() { if (sim) { sim.base = now(); sim.anchor = performance.now(); } }
+
+/* ======================= render agenda ======================= */
+const $ = id => document.getElementById(id);
+const list = $("list");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+function renderAgenda() {
+list.innerHTML = "";
+let lastAct = null;
+SESSIONS.forEach((s, i) => {
+  if (s.act && s.act !== lastAct) {
+    const h = document.createElement("div");
+    h.className = "act"; h.dataset.act = s.act;
+    h.innerHTML = `<span class="tag">${esc(LABELS.act ?? "Act")} ${s.act}</span><h3>${esc(ACTS[s.act] ?? "")}</h3>`;
+    list.appendChild(h);
+    lastAct = s.act;
+  }
+  const el = document.createElement("article");
+  el.className = "s" + (s.kind === "break" ? " brk" : "");
+  el.id = "s" + i;
+  const len = qaMin(s) ? `${s.dur - qaMin(s)} min + ${qaMin(s)} min Q&amp;A` : `${s.dur} min`;
+  const by = s.who ? `<p class="by"><b>${esc(s.who)}</b>${s.role ? ` <span>${esc(s.role)}</span>` : ""}</p>` : "";
+  const ask = s.kind === "talk" && LINKS.qa ? `<a class="ask slido-link" href="${esc(LINKS.qa)}" target="_blank" rel="noopener">Ask a question</a>` : "<span></span>";
+  el.innerHTML = `
+    <div><div class="t">${hhmm(s.from)}–${hhmm(s.to)}</div><div class="len">${len}</div></div>
+    <div>
+      <span class="state" id="st${i}"></span>
+      <h4>${s.kind === "break" ? (s.title === "Lunch" ? "🍽 " : "☕ ") : ""}${esc(s.title)}</h4>
+      ${s.desc ? `<p class="p">${esc(s.desc)}</p>` : ""}
+      ${by}
+    </div>
+    ${ask}
+    <div class="prog" aria-hidden="true"><i id="pg${i}"></i></div>`;
+  list.appendChild(el);
+});
+
+// Links are optional: without one, its buttons (and the QR code) are hidden.
+["qaTop", "qaHero"].forEach(id => { $(id).hidden = !LINKS.qa; if (LINKS.qa) $(id).href = LINKS.qa; });
+$("streamTop").hidden = !LINKS.stream;
+if (LINKS.stream) $("streamTop").href = LINKS.stream;
+renderQr(LINKS.qrUrl || LINKS.qa);
+
+// Event text from the agenda file.
+const doors = hhmm(EVENT_START);
+document.title = `${EV.name} · Live agenda`;
+const brand = EV.brand || { title: EV.name };
+document.querySelector(".brand").setAttribute("aria-label", `${brand.title}, back to top`);
+document.querySelector(".brand b").innerHTML = `${esc(brand.title)}${brand.number ? ` <span>${esc(brand.number)}</span>` : ""}${EV.city ? `<br>${esc(EV.city)}` : ""}`;
+$("presClock").setAttribute("aria-label", `Current ${EV.city} time`);
+$("vBefore").querySelector("h1").textContent = `${EV.name} starts in`;
+$("vBefore").querySelector(".where").textContent = `${EV.dateText ? EV.dateText + ", d" : "D"}oors at ${doors}${EV.city ? " " + EV.city + " time" : ""}.${EV.venue ? " " + EV.venue : ""}`;
+$("vAfter").querySelector("h1").textContent = EV.city ? `That's a wrap for ${EV.city}.` : "That's a wrap.";
+$("vAfter").querySelector(".where").textContent = `Thank you for joining ${EV.name}. Recordings and slides will be shared on the event site.`;
+document.querySelector(".tools .tz").textContent = `All times are ${EV.timeZoneNote || EV.timeZone}. Each talk ends with Q&A.`;
+document.querySelector("footer .wrap > span").textContent = EV.organizer ? `${EV.name} · ${EV.organizer}` : EV.name;
+$("tRange").setAttribute("aria-label", `Simulated time of day, ${EV.city}`);
+
+// Show the start in the viewer's own time zone if it differs from the event's.
+const localOffset = -new Date(EVENT_START).getTimezoneOffset();
+$("localNote").textContent = localOffset !== EVENT_OFFSET_MIN ? `That is ${localFmt.format(new Date(EVENT_START))} where you are.` : "";
+if (LINKS.qa) $("slidoNewTab").href = LINKS.qa;
+}
+
+// "Scan to ask" QR code for presentation mode, generated from the Q&A link (hidden without one).
+function renderQr(url) {
+  const tile = $("qrTile"), box = document.querySelector(".presQr");
+  box.hidden = !url;
+  if (!url || tile.dataset.url === url) return;
+  const q = qrcode(0, "M"); q.addData(url); q.make();
+  const n = q.getModuleCount(), m = 4, w = n + 2 * m;
+  let d = "";
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; ) {
+    if (!q.isDark(y, x)) { x++; continue; }
+    const x0 = x; while (x < n && q.isDark(y, x)) x++;
+    d += `M${x0 + m} ${y + m}h${x - x0}v1h-${x - x0}z`;
+  }
+  tile.innerHTML = `<svg viewBox="0 0 ${w} ${w}" shape-rendering="crispEdges" role="img" aria-label="QR code for ${esc(url)}"><rect width="${w}" height="${w}" fill="#FFFFFF"/><path d="${d}" fill="#0F0F46"/></svg>`;
+  tile.dataset.url = url;
+}
+renderAgenda();
+
+// Update the address bar without reloading. Some viewers (e.g. sandboxed previews at about:srcdoc)
+// don't allow URL changes, so this fails silently there and the page keeps working.
+function safeReplaceUrl(search) {
+  try { history.replaceState(null, "", location.pathname + (search ? "?" + search : "")); } catch (e) {}
+}
+
+/* ======================= live loop ======================= */
+let lastCurrent;
+const pad = n => String(n).padStart(2, "0");
+const minsLeft = ms => Math.max(1, Math.ceil(ms / 60000));
+
+function currentIndex(t) { return SESSIONS.findIndex(s => t >= s.from && t < s.to); }
+function nextIndex(t) { return SESSIONS.findIndex(s => s.from > t); }
+
+function tick(force) {
+  const t = now();
+  const phase = t < EVENT_START ? "before" : t >= EVENT_END ? "after" : "live";
+  $("vBefore").hidden = phase !== "before";
+  $("vLive").hidden = phase !== "live";
+  $("vAfter").hidden = phase !== "after";
+
+  if (phase === "before") {
+    let d = Math.max(0, EVENT_START - t) / 1000;
+    $("cD").textContent = pad(Math.floor(d / 86400)); d %= 86400;
+    $("cH").textContent = pad(Math.floor(d / 3600)); d %= 3600;
+    $("cM").textContent = pad(Math.floor(d / 60));
+    $("cS").textContent = pad(Math.floor(d % 60));
+  }
+
+  const ci = currentIndex(t);
+  const ni = nextIndex(t);
+
+  if (phase === "live" && ci >= 0) {
+    const s = SESSIONS[ci];
+    const elapsed = t - s.from, total = s.to - s.from;
+    const isTalk = s.kind === "talk";
+    const inQa = inQaAt(s, t);
+    $("liveLabel").textContent = s.kind === "break" ? (s.title === "Lunch" ? "Lunch break" : "Coffee break") : inQa ? "Q&A now" : "On stage now";
+    $("liveBadge").style.display = "";
+    $("nowTitle").textContent = s.title;
+    $("nowWho").textContent = s.who ? s.who + (s.role ? ", " + s.role : "") : "Back on stage at " + hhmm(s.to) + ".";
+    $("nowFill").style.width = (elapsed / total * 100).toFixed(2) + "%";
+    $("nowQa").style.width = (qaMin(s) / s.dur * 100) + "%";
+    $("nowRange").textContent = `${hhmm(s.from)}–${hhmm(s.to)}`;
+    $("nowLeft").textContent = `${minsLeft(s.to - t)} min left`;
+    $("qaNow").classList.toggle("on", inQa);
+  } else if (phase === "live" && ni >= 0) {
+    // Changeover between sessions (next speaker getting ready): count down to the next one.
+    const n = SESSIONS[ni], prevEnd = ni > 0 ? SESSIONS[ni - 1].to : n.from;
+    const gap = Math.max(1, n.from - prevEnd);
+    $("liveLabel").textContent = "Up next";
+    $("nowTitle").textContent = n.title;
+    $("nowWho").textContent = n.who ? n.who + (n.role ? ", " + n.role : "") : "";
+    $("nowFill").style.width = (Math.min(1, (t - prevEnd) / gap) * 100).toFixed(2) + "%";
+    $("nowQa").style.width = "0";
+    $("nowRange").textContent = `Starts at ${hhmm(n.from)}`;
+    $("nowLeft").textContent = `in ${minsLeft(n.from - t)} min`;
+    $("qaNow").classList.remove("on");
+  }
+
+  if (phase === "live") {
+    // During a changeover the hero already shows the next session, so this card shows the one after it.
+    const n = ni >= 0 ? SESSIONS[ci >= 0 ? ni : ni + 1] ?? null : null;
+    $("nextBox").hidden = !n;
+    if (n) {
+      $("nextTitle").textContent = n.title + (n.who && n.kind !== "break" ? ` — ${n.who}` : "");
+      $("nextWhen").textContent = `${hhmm(n.from)}, in ${minsLeft(n.from - t)} min`;
+    }
+  }
+
+  // Agenda states
+  SESSIONS.forEach((s, i) => {
+    const el = $("s" + i);
+    const isNow = i === ci;
+    const isPast = t >= s.to;
+    const isSoon = phase !== "after" && i === ni && !isNow;
+    el.classList.toggle("now", isNow);
+    el.classList.toggle("past", isPast);
+    el.classList.toggle("soon", isSoon);
+    const st = $("st" + i);
+    if (isNow) {
+      const inQa = inQaAt(s, t);
+      st.innerHTML = `<i></i>${s.kind === "break" ? "Happening now" : inQa ? "Q&amp;A now" : "On stage now"}`;
+      $("pg" + i).style.width = ((t - s.from) / (s.to - s.from) * 100).toFixed(2) + "%";
+    } else if (isSoon) {
+      st.textContent = phase === "before" ? "First up" : `Up next, in ${minsLeft(s.from - t)} min`;
+    } else st.textContent = "";
+  });
+
+  // Follow the live session
+  const focusIdx = ci >= 0 ? ci : (phase === "live" ? ni : -1);
+  if (focusIdx !== lastCurrent) {
+    lastCurrent = focusIdx;
+    if (focusIdx >= 0 && $("follow").checked && !document.body.classList.contains("present")) scrollToSession(focusIdx);
+  }
+  $("jump").classList.toggle("on", phase === "live" && focusIdx >= 0 && !inView($("s" + focusIdx)));
+
+  renderMini(t, phase, ci, ni);
+  if (document.body.classList.contains("present")) renderPresentation(t, ci, ni);
+
+  // Test banner
+  $("simbar").classList.toggle("on", !!sim && !QUIET);   // ?quiet hides the test banner (demos, screenshots)
+  if (sim) $("simtext").textContent = `Test mode: the page thinks it is ${evDayFmt.format(new Date(t))} ${EV.city} time` + (sim.playing && sim.speed > 1 ? `, running ${sim.speed}× faster` : sim.playing ? "" : ", paused") + ".";
+  if ($("testDlg").open) syncPanel(t);
+}
+
+// Compact strip in the sticky header: what's on, how far along, what's next.
+function renderMini(t, phase, ci, ni) {
+  $("mini").classList.toggle("has", phase !== "after");
+  if (phase === "after") return;
+  const n = ni >= 0 ? SESSIONS[ni] : null;
+  const nextLine = (label, s) => `<span>${label} ${hhmm(s.from)}</span>` +
+    esc(s.title + (s.who && s.kind !== "break" ? ` — ${s.who}` : ""));
+  let lbl, title, left, calm = false;
+  if (phase === "before") {
+    let d = Math.max(0, EVENT_START - t) / 1000;
+    const days = Math.floor(d / 86400); d %= 86400;
+    lbl = "Starts in"; calm = true;
+    title = (days ? days + "d " : "") + `${pad(Math.floor(d / 3600))}:${pad(Math.floor(d % 3600 / 60))}:${pad(Math.floor(d % 60))}`;
+    left = "";
+  } else if (ci >= 0) {
+    const s = SESSIONS[ci];
+    const inQa = inQaAt(s, t);
+    lbl = s.kind === "break" ? (s.title === "Lunch" ? "Lunch" : "Break") : inQa ? "Q&A now" : "Now";
+    calm = s.kind === "break";
+    title = s.title + (s.who && s.kind !== "break" ? ` — ${s.who}` : "");
+    left = `${minsLeft(s.to - t)} min left`;
+    $("mFill").style.width = ((t - s.from) / (s.to - s.from) * 100).toFixed(2) + "%";
+    $("mQa").style.width = (qaMin(s) / s.dur * 100) + "%";
+  } else {
+    lbl = "Up next"; calm = true; title = n ? n.title + (n.who && n.kind !== "break" ? ` — ${n.who}` : "") : "";
+    left = n ? `in ${minsLeft(n.from - t)} min` : "";
+  }
+  $("mLbl").classList.toggle("calm", calm);
+  $("mLblT").textContent = lbl;
+  $("mTitle").textContent = title;
+  $("mLeft").textContent = left;
+  $("mBar").hidden = !(phase === "live" && ci >= 0);
+  const nx = phase === "before" ? SESSIONS[0] : (ci >= 0 ? n : SESSIONS[ni + 1]);
+  $("mNext").innerHTML = nx ? nextLine(phase === "before" ? "First up" : "Next", nx) : "";
+}
+
+// Show the strip only once the big hero has scrolled under the header.
+new IntersectionObserver(([e]) => document.body.classList.toggle("scrolled", !e.isIntersecting),
+  { rootMargin: "-64px 0px 0px 0px" }).observe(document.querySelector(".hero"));
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function scrollToSession(i) { $("s" + i).scrollIntoView({ block:"center", behavior: reduced ? "auto" : "smooth" }); }
+function inView(el) { const r = el.getBoundingClientRect(); return r.bottom > document.querySelector("header.top").offsetHeight + 16 && r.top < innerHeight; }
+$("jump").addEventListener("click", () => { if (lastCurrent >= 0) scrollToSession(lastCurrent); });
+
+/* ======================= test mode ======================= */
+function panelFrom() { return EVENT_START - 30 * 60000; }   // 08:30
+function panelTo() { return EVENT_END + 20 * 60000; }        // 18:15
+const range = $("tRange");
+range.max = Math.round((panelTo() - panelFrom()) / 60000);
+
+// Shortcuts are looked up by kind at click time, so they follow agenda updates.
+const talks = () => SESSIONS.filter(s => s.kind === "talk");
+const JUMPS = [
+  ["3 days before", () => EVENT_START - 3 * 86400000 + 4 * 3600000],
+  ["10 min before start", () => EVENT_START - 10 * 60000],
+  ["First talk", () => talks()[0]?.from + 5 * 60000],
+  ["Q&A of first talk", () => talks()[0] ? qaStart(talks()[0]) + 2 * 60000 : NaN],
+  ["Coffee break", () => SESSIONS.find(s => s.kind === "break" && s.title !== "Lunch")?.from + 3 * 60000],
+  ["Lunch", () => SESSIONS.find(s => s.title === "Lunch")?.from + 20 * 60000],
+  ["Last talk", () => talks().at(-1)?.from + 10 * 60000],
+  ["After the close", () => EVENT_END + 10 * 60000],
+];
+JUMPS.forEach(([label, fn]) => {
+  if (isNaN(fn())) return;
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = label;
+  b.addEventListener("click", () => { const ms = fn(); if (!isNaN(ms)) setSim(ms, +$("tSpeed").value, true); });
+  $("tChips").appendChild(b);
+});
+
+function syncPanel(t) {
+  $("tClock").textContent = evDayFmt.format(new Date(t));
+  if (document.activeElement !== range) {
+    range.value = Math.max(0, Math.min(+range.max, Math.round((t - panelFrom()) / 60000)));
+  }
+  $("tPlay").textContent = sim && !sim.playing ? "Run clock" : "Pause clock";
+}
+range.addEventListener("input", () => setSim(panelFrom() + range.value * 60000, +$("tSpeed").value, sim ? sim.playing : true));
+$("tSpeed").addEventListener("change", e => { if (!sim) setSim(Date.now(), +e.target.value, true); else { rebaseSim(); sim.speed = +e.target.value; } });
+$("tPlay").addEventListener("click", () => {
+  if (!sim) { setSim(Date.now(), +$("tSpeed").value, false); return; }
+  rebaseSim(); sim.playing = !sim.playing; tick(true);
+});
+function exitSim() { sim = null; lastCurrent = undefined; safeReplaceUrl(""); tick(); }
+$("tExit").addEventListener("click", () => { exitSim(); $("testDlg").close(); });
+$("simExit").addEventListener("click", exitSim);
+function openPanel() {
+  if (!sim) setSim(EVENT_START + 5 * 60000, 1, true); // start at 09:05 on event day
+  $("tSpeed").value = String(sim.speed);
+  $("testDlg").showModal();
+  syncPanel(now());
+}
+$("openTest").addEventListener("click", openPanel);
+$("simEdit").addEventListener("click", openPanel);
+
+// Deep link for testing: ?sim=14:50 (event day, event time) or ?sim=2026-10-05T18:00, optional &speed=60
+(() => {
+  const q = new URLSearchParams(location.search);
+  const v = q.get("sim");
+  if (!v) return;
+  let ms;
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(v)) { const [h, m, sec = 0] = v.split(":").map(Number); ms = DATE0_UTC + (h * 3600 + m * 60 + sec) * 1000; }
+  else { const p = Date.parse(v.length <= 16 ? v + ":00" + EV.utcOffset : v); if (!isNaN(p)) ms = p; }
+  if (ms) setSim(ms, +(q.get("speed") || 1), true);
+})();
+
+/* ======================= presentation mode ======================= */
+const body = document.body;
+let wakeLock = null, ctlTimer = null;
+async function keepAwake(on) {
+  try {
+    if (on && "wakeLock" in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request("screen"); wakeLock.addEventListener("release", () => wakeLock = null); }
+    if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch (e) {}
+}
+function setMode(present, push = true) {
+  body.classList.toggle("present", present);
+  if (push) {
+    const q = new URLSearchParams(location.search);
+    present ? q.set("mode", "present") : q.delete("mode");
+    safeReplaceUrl(q.toString());
+  }
+  keepAwake(present);
+  if (!present && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  if (present) { scrollTo(0, 0); pokeControls(); }
+  tick(true);
+}
+function pokeControls() {
+  const c = $("presCtl");
+  c.classList.add("show"); body.classList.remove("nocursor");
+  clearTimeout(ctlTimer);
+  ctlTimer = setTimeout(() => { c.classList.remove("show"); if (body.classList.contains("present")) body.classList.add("nocursor"); }, 2500);
+}
+function toggleFull() {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else document.documentElement.requestFullscreen?.().catch(() => {});
+}
+$("presentTop").addEventListener("click", () => setMode(true));
+$("presentFoot").addEventListener("click", () => setMode(true));
+$("presExit").addEventListener("click", () => setMode(false));
+$("presFull").addEventListener("click", toggleFull);
+document.addEventListener("fullscreenchange", () => $("presFull").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen");
+addEventListener("mousemove", () => { if (body.classList.contains("present")) pokeControls(); });
+addEventListener("keydown", e => {
+  if (e.target.closest("input,select,textarea") || e.metaKey || e.ctrlKey || e.altKey || document.querySelector("dialog[open]")) return;
+  if (e.key === "p" || e.key === "P") setMode(!body.classList.contains("present"));
+  else if ((e.key === "f" || e.key === "F") && body.classList.contains("present")) toggleFull();
+});
+document.addEventListener("visibilitychange", () => { if (!document.hidden && body.classList.contains("present")) keepAwake(true); });
+
+function renderPresentation(t, ci, ni) {
+  $("presClock").textContent = evFmt.format(new Date(t));
+  const s = ci >= 0 ? SESSIONS[ci] : null;
+  body.classList.toggle("qa-live", !!(s && inQaAt(s, t)));
+  // three upcoming items after the "up next" card (or the first three before the event)
+  const startIdx = t < EVENT_START ? 0 : (ni >= 0 ? ni + (ci >= 0 ? 1 : 2) : SESSIONS.length);
+  const items = SESSIONS.slice(startIdx, startIdx + 4);
+  const html = items.map(x => `<li><div class="t">${hhmm(x.from)}</div><div class="n">${esc(x.title)}</div>${x.who && x.kind !== "break" ? `<div class="w">${esc(x.who)}</div>` : ""}</li>`).join("");
+  if ($("presUp").dataset.k !== html) { $("presUp").innerHTML = html; $("presUp").dataset.k = html; }
+}
+
+/* ======================= Slido dialog ======================= */
+const slidoDlg = $("slidoDlg");
+function openSlido(context) {
+  const f = $("slidoFrame");
+  if (!f.src) f.src = LINKS.qa;          // load once, keep the session alive between opens
+  $("slidoTitle").textContent = context ? `Ask a question · ${context}` : "Ask a question";
+  slidoDlg.showModal();
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("a.slido-link");
+  if (!a) return;
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let people force a new tab
+  e.preventDefault();
+  const card = a.closest(".s");
+  const title = card ? card.querySelector("h4")?.textContent : (a.id === "qaHero" ? $("nowTitle").textContent : "");
+  openSlido(title);
+});
+$("slidoClose").addEventListener("click", () => slidoDlg.close());
+$("slidoNewTab").addEventListener("click", () => slidoDlg.close());
+slidoDlg.addEventListener("click", e => { if (e.target === slidoDlg) slidoDlg.close(); }); // click on backdrop closes
+
+if (new URLSearchParams(location.search).get("mode") === "present") setMode(true, false);
+tick(true);
+setInterval(() => tick(false), 250);
+
+/* ======================= CLI loop ======================= */
+// The hero's prompt plays a little terminal scene on repeat: it types a command, "corrects" its argument a few
+// times before landing on the real one, boots the event, shows what's on air, and exits. Decorative only.
+// Configured by the agenda's optional "cli" block (see README); every field has a default:
+//   command  "onair --city"        typed first
+//   answer   event city, lowercase  the final argument
+//   guesses  []                     arguments typed and erased before the answer
+//   jokes    true                   one joke command per loop (true = built-in list, an array = yours, false = none)
+//   exitCode 0                      printed as "exit <code>" at the end
+//   enabled  true                   false shows a static prompt
+const cliConf = () => ({
+  command: CLI.command ?? "onair --city",
+  answer: CLI.answer ?? (EV.city || "").toLowerCase(),
+  guesses: Array.isArray(CLI.guesses) ? CLI.guesses : [],
+  jokes: CLI.jokes === false ? [] : Array.isArray(CLI.jokes) ? CLI.jokes : CLI_JOKES,
+  exitCode: CLI.exitCode ?? 0,
+  enabled: CLI.enabled !== false,
+});
+// Built-in jokes: one runs as the last init step of each loop, right before the exit code. There are 42 of them.
+const CLI_JOKES = [
+  "sudo make coffee --double-shot",
+  "git blame --someone-else",
+  "npm install patience --save-dev",
+  "docker run --rm impostor-syndrome",
+  "kubectl delete pod monday",
+  "rm -rf legacy/ --dry-run",
+  "ping questions --ask-nicely",
+  "ssh speaker@stage 'ready?'",
+  "grep -r 'meaning of life' .",
+  "chmod +x hype",
+  "curl -X POST /api/applause",
+  "terraform apply --auto-approve-snacks",
+  "crontab -e '0 13 * * * lunch'",
+  "llm --prompt 'write my talk' --temperature 0",
+  "tokens --burn=less --think=more",
+  "git commit -m 'fixed it for real this time'",
+  "git push --force-with-hope",
+  "mvn clean install --skip-coffee-break",
+  "export WIFI_PASSWORD=ask_at_the_desk",
+  "tail -f questions.log",
+  "top --sort=enthusiasm",
+  "kill -9 small-talk",
+  "systemctl restart projector",
+  "apt-get install more-chairs",
+  "git checkout -b plan-b",
+  "git stash pop --excuses",
+  "brew install espresso",
+  "./configure --with-clicker --without-cables",
+  "nslookup the-answer  # 42",
+  "ulimit -n infinite-questions",
+  "pip install --upgrade slides",
+  "mkdir -p ~/.ideas/after-this-talk",
+  "history | grep 'it worked yesterday'",
+  "date --vibes=good",
+  "echo 'hello, world' > /dev/stage",
+  "unzip lunch.zip --wait 13:00",
+  "make demo DEMO_GODS=friendly",
+  "ln -s coffee fuel",
+  "watch -n 1 stage_clock",
+  "git rebase -i --keep-the-good-parts",
+  "yes 'one more question' | head -1",
+  "find / -name 'keys' -mtime -1",
+];
+let lastJoke = -1;
+function pickJoke(list) {
+  if (!list.length) return null;
+  let i;
+  do i = Math.floor(Math.random() * list.length); while (i === lastJoke && list.length > 1);
+  lastJoke = i;
+  return list[i];
+}
+function onAirLine() {
+  const t = now(), ci = currentIndex(t), ni = nextIndex(t);
+  if (t < EVENT_START) return `first up ${hhmm(SESSIONS[0].from)}: ${SESSIONS[0].title}`;
+  if (t >= EVENT_END) return `that's a wrap.${EV.city ? " thank you, " + EV.city.toLowerCase() : " thank you!"}`;
+  if (ci >= 0) {
+    const s = SESSIONS[ci];
+    return s.kind === "break" ? `${s.title.toLowerCase()} until ${hhmm(s.to)}` : `on air: ${s.title}${s.who ? " — " + s.who : ""}`;
+  }
+  return `up next ${hhmm(SESSIONS[ni].from)}: ${SESSIONS[ni].title}`;
+}
+(async function cliLoop() {
+  const L = [$("cliL1"), $("cliL2")];
+  let lines = [];              // { text, out } — the terminal's scrollback
+  const draw = () => {
+    const view = lines.slice(-2);
+    L.forEach((el, i) => {
+      const l = view[i];
+      el.className = "ln" + (l?.out ? " out" : "");
+      el.textContent = l ? (l.out ? l.text : "> " + l.text) : "";
+      if (l && i === view.length - 1 && !l.out) { const c = document.createElement("span"); c.className = "cur"; el.appendChild(c); }
+    });
+  };
+  const full = c => [c.command, c.answer].filter(Boolean).join(" ");
+  if (reduced || !cliConf().enabled) { lines = [{ text: full(cliConf()) }]; draw(); return; }
+  // While someone is on stage (a talk, its Q&A, or a keynote) the terminal goes quiet: no typing, no jokes,
+  // just the command and what's on air. The scene picks up again in breaks, changeovers and before/after.
+  const onStage = () => { const ci = currentIndex(now()); return ci >= 0 && SESSIONS[ci].kind !== "break"; };
+  const HUSH = Symbol("hush");
+  const sleep = ms => new Promise(r => setTimeout(r, ms)).then(() => { if (onStage()) throw HUSH; });
+  const type = async txt => { for (const ch of txt) { lines.at(-1).text += ch; draw(); await sleep(45 + Math.random() * 95); } };
+  const erase = async n => { for (let i = 0; i < n; i++) { lines.at(-1).text = lines.at(-1).text.slice(0, -1); draw(); await sleep(38); } };
+  const print = async (text, ms) => { lines.push({ text, out: true }); draw(); await sleep(ms); };
+  const hush = async () => {
+    while (onStage()) {
+      lines = [{ text: full(cliConf()) }, { text: onAirLine(), out: true }]; draw();
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  };
+  for (;;) {
+    try { await scene(); }
+    catch (e) { if (e !== HUSH) throw e; }
+    await hush();
+  }
+  async function scene() {
+    if (onStage()) throw HUSH;
+    const c = cliConf();                                           // re-read: the agenda may have changed
+    lines = [{ text: "" }]; draw();
+    await sleep(700);
+    await type(c.command ? c.command + " " : "");
+    for (const wrong of c.guesses) {
+      await type(wrong); await sleep(650);
+      await erase(wrong.length); await sleep(260);
+    }
+    await type(c.answer); await sleep(650);
+    await print("initializing event…", 900);                       // ⏎
+    await print(`loading agenda… ${SESSIONS.length} sessions ✓`, 1100);
+    await print(onAirLine(), 4200);
+    const joke = pickJoke(c.jokes);
+    if (joke) await print(`${joke} ✓`, 2400);
+    await print(`exit ${c.exitCode}`, 2200);                       // the run's exit code
+    lines.push({ text: "" }); draw();                              // back to an empty prompt
+    await sleep(900);
+  }
+})();
+
+/* ======================= auto-reload ======================= */
+// Keep open pages current. Every 20 s, check whether the agenda or this page itself changed;
+// if so, reload. The reload waits while someone has a dialog open, is typing, or is presenting
+// full screen (a reload would drop full screen); in that case agenda changes are applied in place
+// and the reload happens as soon as it's safe.
+const POLL_MS = 20000;
+const RELOAD_KEY = "br-reload-state";
+const hash = str => { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0; return h; };
+const pageUrl = () => location.href.split("#")[0];
+async function fetchPageHash() {
+  const r = await fetch(bust(pageUrl()), { cache: "no-store" });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return hash(await r.text());
+}
+let pageHash = null, reloadPending = false;
+fetchPageHash().then(h => pageHash = h).catch(() => {}); // baseline; fails harmlessly for file://
+
+const canReload = () => !document.querySelector("dialog[open]") && !document.fullscreenElement &&
+  !document.activeElement?.matches?.("input,select,textarea");
+
+function reloadNow() {
+  // Carry over what the viewer was doing so the reload is invisible.
+  try {
+    sessionStorage.setItem(RELOAD_KEY, JSON.stringify({
+      at: Date.now(), y: scrollY, follow: $("follow").checked,
+      sim: sim ? { base: now(), speed: sim.speed, playing: sim.playing } : null,
+    }));
+  } catch (e) {}
+  location.reload();
+}
+
+function applyInPlace(data, text) {
+  agendaText = text;
+  setData(data);
+  renderAgenda();
+  range.max = Math.round((panelTo() - panelFrom()) / 60000);
+  tick(true);
+}
+
+let checking = false;
+async function checkForUpdates() {
+  if (checking) return;
+  checking = true;
+  try {
+    let fresh = null, pageChanged = false;
+    try {
+      const got = await fetchAgenda();
+      if (got.text !== agendaText && got.data?.sessions?.length) fresh = got;
+    } catch (e) { /* offline or mid-deploy: try again next time */ }
+    try { if (pageHash !== null) pageChanged = (await fetchPageHash()) !== pageHash; } catch (e) {}
+    if (fresh || pageChanged) reloadPending = true;
+    if (!reloadPending) return;
+    if (canReload()) return reloadNow();
+    if (fresh) applyInPlace(fresh.data, fresh.text);
+  } finally { checking = false; }
+}
+setInterval(checkForUpdates, POLL_MS);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkForUpdates(); });
+// A held-back reload goes through as soon as the blocker is gone.
+const reloadIfPending = () => setTimeout(() => { if (reloadPending && canReload()) reloadNow(); }, 300);
+document.addEventListener("fullscreenchange", reloadIfPending);
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("close", reloadIfPending));
+document.addEventListener("focusout", reloadIfPending);
+
+// Restore the viewer's state after an automatic reload.
+(() => {
+  let st = null;
+  try { st = JSON.parse(sessionStorage.getItem(RELOAD_KEY) || "null"); sessionStorage.removeItem(RELOAD_KEY); } catch (e) {}
+  if (!st || Date.now() - st.at > 60000) return;
+  $("follow").checked = st.follow;
+  if (st.sim) setSim(st.sim.base + (st.sim.playing ? (Date.now() - st.at) * st.sim.speed : 0), st.sim.speed, st.sim.playing);
+  if (!st.follow) requestAnimationFrame(() => scrollTo(0, st.y));
+})();
+addEventListener("scroll", () => $("jump").classList.toggle("on", lastCurrent >= 0 && !inView($("s" + lastCurrent)) && now() >= EVENT_START && now() < EVENT_END), { passive:true });
+</script>
+</body>
+</html>

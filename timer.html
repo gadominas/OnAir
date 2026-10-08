@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speaker timer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05051A; --ink:#0F0F46; --mint:#3ACEA9; --text:#FFFFFF; --soft:#C9CBE8; --dim:#8E92C8; --line:rgba(255,255,255,.14);
+  --amber:#F5A524; --orange:#FF7A1A; --red:#FF3B3F;
+  --digits:var(--text);
+  --sans:'Spline Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans)}
+body.nocursor{cursor:none}
+.screen{height:100vh;height:100dvh;display:grid;grid-template-rows:auto 1fr auto;padding:3vh 3vw;gap:2vh;position:relative}
+
+/* top: what's on */
+.top{display:flex;align-items:center;gap:1.4vw;min-width:0}
+.chip{flex:none;font:700 clamp(14px,2.6vh,34px) var(--mono);letter-spacing:.06em;padding:.3em .8em;border-radius:.5em;background:rgba(255,255,255,.1);color:var(--soft)}
+.chip.talk{background:rgba(58,206,169,.16);color:var(--mint)}
+.chip.qa{background:rgba(120,140,255,.2);color:#B9C3FF}
+.what{min-width:0;flex:1}
+.what b{display:block;font-size:clamp(16px,3.4vh,44px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.what span{display:block;font-size:clamp(13px,2.4vh,30px);color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{flex:none;font:600 clamp(18px,4vh,52px)/1 var(--mono);color:var(--dim);font-variant-numeric:tabular-nums}
+
+/* middle: the countdown */
+.mid{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;gap:2vh}
+.digits{--len:5;font:700 calc(min(92vw / (var(--len) * .6), 58vh))/.9 var(--mono);font-variant-numeric:tabular-nums;
+  letter-spacing:-.04em;color:var(--digits);white-space:nowrap;transition:color .4s}
+.sub{font:600 clamp(16px,3.6vh,48px) var(--mono);color:var(--soft);text-align:center}
+.bar{width:min(92vw,1600px);height:clamp(8px,1.4vh,18px);background:var(--line);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--digits);border-radius:999px;transition:width .25s linear,background .4s}
+.bar[hidden]{display:none}
+
+/* bottom: next up */
+.bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:2vw;min-width:0;border-top:1px solid var(--line);padding-top:1.6vh}
+.next{min-width:0;font-size:clamp(14px,2.8vh,36px);color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.next em{font:600 .8em var(--mono);font-style:normal;color:var(--mint);margin-right:.6em}
+.plan{flex:none;font:500 clamp(12px,2.2vh,28px) var(--mono);color:var(--dim)}
+
+/* alert levels (set on body) */
+body.l5 {--digits:var(--amber)}
+body.l2 {--digits:var(--orange)}
+body.l1 {--digits:var(--red)}
+body.l1 .digits{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+
+/* threshold banner: "5 MIN LEFT" etc. */
+.banner{position:absolute;left:50%;top:13vh;transform:translateX(-50%);font:800 clamp(22px,7vh,96px) var(--sans);letter-spacing:.02em;
+  padding:.25em .8em;border-radius:.4em;background:var(--digits);color:#05051A;white-space:nowrap;display:none;animation:pop 1s ease-in-out infinite}
+.banner.on{display:block}
+@keyframes pop{50%{transform:translateX(-50%) scale(1.06)}}
+
+/* full-screen alarm: stop now / time's up */
+.alarm{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:3vh;text-align:center;
+  background:var(--red);color:#fff;animation:blink 1s steps(1) infinite;z-index:5;padding:4vh 4vw}
+body.alarming .alarm{display:flex}
+.alarm b{font:800 clamp(48px,22vh,320px)/.95 var(--sans);letter-spacing:-.02em}
+.alarm span{font:700 clamp(20px,6vh,84px) var(--sans)}
+.alarm small{font:700 clamp(18px,5vh,64px) var(--mono)}
+@keyframes blink{50%{background:#000;color:var(--red)}}
+@media (prefers-reduced-motion:reduce){.alarm{animation:none}.banner{animation:none}body.l1 .digits{animation:none}}
+
+/* calm states */
+body.calm{--digits:var(--mint)}
+
+.ctl{position:fixed;right:2vw;bottom:2vh;display:flex;gap:8px;z-index:10;opacity:0;transition:opacity .3s}
+.ctl.show,.ctl:focus-within{opacity:1}
+.ctl button{font:600 13px var(--sans);background:rgba(255,255,255,.1);color:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer}
+.simtag{position:fixed;top:1vh;left:50%;transform:translateX(-50%);font:600 12px var(--mono);background:#FFF4D6;color:#5A3E00;padding:4px 10px;border-radius:8px;z-index:11}
+.simtag[hidden]{display:none}
+.err{padding:6vh 4vw;font-size:22px}
+</style>
+</head>
+<body>
+
+<div class="screen" id="screen">
+  <div class="top">
+    <span class="chip" id="chip">—</span>
+    <div class="what"><b id="title"></b><span id="who"></span></div>
+    <span class="clock" id="clock"></span>
+  </div>
+  <div class="mid">
+    <div class="digits" id="digits">--:--</div>
+    <div class="bar" id="bar"><i id="fill"></i></div>
+    <div class="sub" id="sub"></div>
+  </div>
+  <div class="bottom">
+    <div class="next" id="next"></div>
+    <div class="plan" id="plan"></div>
+  </div>
+  <div class="banner" id="banner" role="status"></div>
+  <div class="alarm" role="alert"><b id="alarmBig">STOP</b><span id="alarmMsg"></span><small id="alarmSmall"></small></div>
+</div>
+
+<div class="simtag" id="simtag" hidden></div>
+<div class="ctl" id="ctl"><button type="button" id="fs" title="Full screen (F)">Full screen</button></div>
+
+<script type="module">
+/* ======================= agenda ======================= */
+// Speaker confidence monitor. Agenda: agenda.json from the host serving this page; ?agenda=<url> overrides it,
+// ?sim=HH:MM&speed=60 rehearses a time. Agenda changes (e.g. "Start now" in the admin) are picked up
+// every few seconds without reloading.
+const q = new URLSearchParams(location.search);
+const AGENDA_URL = q.get("agenda") || "agenda.json";
+const ALERTS = [5, 2, 1];          // minutes left that trigger a warning
+const BANNER_MS = 8000;            // how long the "N MIN LEFT" banner shows after a threshold
+const STOP_MS = 20000;             // how long the screen blinks when the talk part is over
+const TIMES_UP_MS = 30000;         // how long it blinks when the session is fully over
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const toMin = t => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+const bust = u => { const x = new URL(u, location.href); x.searchParams.set("_", Date.now()); return x.href; };
+const isLocal = ["localhost", "127.0.0.1", "[::1]"].includes(new URL(AGENDA_URL, location.href).hostname);
+const POLL_MS = isLocal ? 5000 : 15000; // local agenda: near-instant; GitHub Pages: deploy-bound anyway
+
+async function fetchAgenda() {
+  const r = await fetch(bust(AGENDA_URL), { cache: "no-store" });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const text = await r.text();
+  return { text, data: JSON.parse(text) };
+}
+
+let EV, TALK, QA, SESSIONS, EVENT_START, EVENT_END, agendaText, fmt;
+function setData(a) {
+  EV = a.event; TALK = a.timing.talkMinutes; QA = a.timing.qaMinutes; SESSIONS = a.sessions;
+  // Per-talk Q&A: a talk's "qa" minutes (default timing.qaMinutes) end its slot; the talk part is the rest.
+  SESSIONS.forEach(s => s.qaMin = s.kind === "talk" ? Math.max(0, Math.min(s.dur, s.qa ?? QA)) : 0);
+  const date0 = Date.parse(`${EV.date}T00:00:00${EV.utcOffset}`);
+  SESSIONS.forEach(s => { s.from = date0 + toMin(s.start) * 60000; s.to = s.from + s.dur * 60000; });
+  EVENT_START = SESSIONS[0].from; EVENT_END = SESSIONS.at(-1).to;
+  fmt = new Intl.DateTimeFormat("en-GB", { timeZone: EV.timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  document.title = `${EV.name} · Speaker timer`;
+  // Optional accent colour from agenda.json "theme" (used for the talk chip, calm states and "next").
+  a.theme?.accent ? document.documentElement.style.setProperty("--mint", a.theme.accent) : document.documentElement.style.removeProperty("--mint");
+}
+try {
+  const got = await fetchAgenda();
+  agendaText = got.text; setData(got.data);
+} catch (e) {
+  document.body.innerHTML = `<div class="err">Couldn't load the agenda (${String(e.message).replace(/[<>&]/g, "")}). Retrying…</div>`;
+  setTimeout(() => location.reload(), 10000);
+  throw e;
+}
+
+/* ======================= clock ======================= */
+let sim = null;
+const simParam = q.get("sim");
+if (simParam && /^\d{1,2}:\d{2}(:\d{2})?$/.test(simParam)) {
+  const [h, m, sec = 0] = simParam.split(":").map(Number);
+  sim = { base: Date.parse(`${EV.date}T00:00:00${EV.utcOffset}`) + (h * 3600 + m * 60 + sec) * 1000, anchor: performance.now(), speed: +(q.get("speed") || 1) };
+}
+const now = () => sim ? sim.base + (performance.now() - sim.anchor) * sim.speed : Date.now();
+const hhmm = ms => fmt.format(new Date(ms));
+// Countdown text: m:ss under an hour, h:mm:ss above.
+function clockText(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  return h ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+}
+const overText = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return `+${Math.floor(s / 60)}:${pad(s % 60)}`; };
+const speaker = s => s.who ? s.who + (s.role ? ", " + s.role : "") : "";
+
+/* ======================= render ======================= */
+function setLevel(left, alerting) {
+  const lvl = !alerting ? "" : left <= 60000 ? "l1" : left <= 120000 ? "l2" : left <= 300000 ? "l5" : "";
+  for (const c of ["l5", "l2", "l1"]) document.body.classList.toggle(c, c === lvl);
+  // Banner right after crossing a threshold (stateless, so it survives reloads).
+  const hit = alerting && ALERTS.find(min => left <= min * 60000 && left > min * 60000 - BANNER_MS);
+  $("banner").classList.toggle("on", !!hit);
+  if (hit) $("banner").textContent = hit === 1 ? "LAST MINUTE" : `${hit} MIN LEFT`;
+}
+function setDigits(text) {
+  $("digits").style.setProperty("--len", text.length);
+  if ($("digits").textContent !== text) $("digits").textContent = text;
+}
+
+function tick() {
+  const t = now();
+  $("clock").textContent = hhmm(t);
+  const ci = SESSIONS.findIndex(s => t >= s.from && t < s.to);
+  const ni = SESSIONS.findIndex(s => s.from > t);
+  const cur = ci >= 0 ? SESSIONS[ci] : null;
+  const prev = ci < 0 && ni > 0 ? SESSIONS[ni - 1] : ci < 0 && ni < 0 ? SESSIONS.at(-1) : null;
+
+  let chip = "", chipCls = "", title = "", who = "", sub = "", left = 0, total = 0, alerting = false, calm = false;
+  let alarm = null; // { big, msg, small }
+  let nextS = ni >= 0 ? SESSIONS[ni] : null;
+
+  if (t < EVENT_START) {
+    chip = "BEFORE"; calm = true;
+    title = EV.name; who = `Doors ${hhmm(EVENT_START)}`;
+    left = EVENT_START - t; sub = "until the first session";
+  } else if (cur) {
+    title = cur.title; who = speaker(cur);
+    const qaStart = cur.to - cur.qaMin * 60000;
+    if (cur.kind === "break") {
+      chip = cur.title === "Lunch" ? "LUNCH" : "BREAK"; calm = true;
+      who = `Back at ${hhmm(cur.to)}`;
+      left = cur.to - t; total = cur.to - cur.from; sub = "break";
+    } else if (t < qaStart) {
+      chip = cur.kind === "talk" ? "TALK" : "KEYNOTE"; chipCls = "talk";
+      left = qaStart - t; total = qaStart - cur.from; alerting = true;
+      sub = cur.qaMin ? `talk time left · Q&A ${cur.qaMin} min after` : "time left";
+    } else {
+      chip = "Q&A"; chipCls = "qa";
+      left = cur.to - t; total = cur.to - qaStart; alerting = true; sub = "Q&A time left";
+      if (t - qaStart < STOP_MS) alarm = { big: "STOP", msg: "Time for Q&A", small: `Q&A ${clockText(left)}` };
+    }
+  } else if (prev && t - prev.to < TIMES_UP_MS && prev.kind !== "break") {
+    // Session just ended: make sure the speaker sees it.
+    chip = "TIME"; title = prev.title; who = speaker(prev);
+    alarm = { big: "TIME'S UP", msg: "Please wrap up", small: overText(t - prev.to) };
+  } else if (nextS) {
+    chip = "NEXT"; calm = true;
+    title = nextS.title; who = speaker(nextS);
+    left = nextS.from - t; sub = `starts at ${hhmm(nextS.from)}`;
+    nextS = SESSIONS[ni + 1] ?? null;
+  } else {
+    chip = "DONE"; calm = true; title = EV.city ? `That's a wrap, ${EV.city}!` : "That's a wrap!"; who = EV.name; sub = "";
+  }
+
+  $("chip").textContent = chip;
+  $("chip").className = "chip " + chipCls;
+  $("title").textContent = title;
+  $("who").textContent = who;
+  $("sub").textContent = sub;
+  setDigits(left > 0 || chip !== "DONE" ? clockText(left) : "0:00");
+  $("bar").hidden = !total;
+  if (total) $("fill").style.width = Math.max(0, Math.min(100, left / total * 100)).toFixed(2) + "%";
+  document.body.classList.toggle("calm", calm);
+  setLevel(left, alerting && !alarm);
+
+  document.body.classList.toggle("alarming", !!alarm);
+  if (alarm) { $("alarmBig").textContent = alarm.big; $("alarmMsg").textContent = alarm.msg; $("alarmSmall").textContent = alarm.small; }
+
+  // After the current one (during a talk) or after the one being announced (changeover).
+  const upcoming = cur ? (SESSIONS[ci + 1] ?? null) : nextS;
+  $("next").innerHTML = upcoming
+    ? `<em>NEXT ${hhmm(upcoming.from)}</em>` + esc(upcoming.title + (upcoming.who && upcoming.kind !== "break" ? ` — ${upcoming.who}` : ""))
+    : "";
+  $("plan").textContent = cur && cur.kind !== "break" ? `${hhmm(cur.from)}–${hhmm(cur.to)}` : "";
+
+  $("simtag").hidden = !sim || q.has("quiet");          // ?quiet hides the test tag (demos, screenshots)
+  if (sim) $("simtag").textContent = `Test time ${new Intl.DateTimeFormat("en-GB", { timeZone: EV.timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).format(new Date(t))}${sim.speed > 1 ? ` · ${sim.speed}×` : ""}`;
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+tick();
+setInterval(tick, 200);
+
+/* ======================= controls ======================= */
+const toggleFull = () => document.fullscreenElement ? document.exitFullscreen().catch(() => {}) : document.documentElement.requestFullscreen?.().catch(() => {});
+$("fs").addEventListener("click", toggleFull);
+document.addEventListener("fullscreenchange", () => $("fs").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen");
+addEventListener("keydown", e => { if (!e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === "f") toggleFull(); });
+let ctlTimer;
+function poke() {
+  $("ctl").classList.add("show"); document.body.classList.remove("nocursor");
+  clearTimeout(ctlTimer);
+  ctlTimer = setTimeout(() => { $("ctl").classList.remove("show"); document.body.classList.add("nocursor"); }, 2500);
+}
+addEventListener("mousemove", poke);
+poke();
+let wake = null;
+const keepAwake = async () => { try { if ("wakeLock" in navigator && !wake && !document.hidden) { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => wake = null); } } catch (e) {} };
+keepAwake();
+document.addEventListener("visibilitychange", keepAwake);
+
+/* ======================= live updates ======================= */
+// Agenda changes apply in place right away (no reload, so full screen stays on).
+// If this page itself changed, reload, except in full screen, where it waits until full screen ends.
+const hash = str => { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0; return h; };
+const pageHash = () => fetch(bust(location.href.split("#")[0]), { cache: "no-store" }).then(r => r.ok ? r.text() : Promise.reject()).then(hash);
+let baseHash = null, reloadPending = false;
+pageHash().then(h => baseHash = h).catch(() => {});
+async function check() {
+  try {
+    const got = await fetchAgenda();
+    if (got.text !== agendaText && got.data?.sessions?.length) { agendaText = got.text; setData(got.data); tick(); }
+  } catch (e) {}
+  try { if (baseHash !== null && (await pageHash()) !== baseHash) reloadPending = true; } catch (e) {}
+  if (reloadPending && !document.fullscreenElement) location.reload();
+}
+setInterval(check, POLL_MS);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && reloadPending) location.reload(); });
+</script>
+</body>
+</html>

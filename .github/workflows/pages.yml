@@ -1,0 +1,41 @@
+# Deploys the site (the whole repository) to GitHub Pages on every push to main.
+# Requires Settings → Pages → Build and deployment → Source: "GitHub Actions"
+# (otherwise GitHub also runs its own branch deploy, and the two cancel each other).
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only the newest push matters (the agenda changes often on the day), so a newer push cancels an older
+# deploy still in progress. A cancelled Pages deploy leaves the previous version live.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload the entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OnAir admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0F0F46; --navy:#2A2A72; --mint:#3ACEA9; --mint-ink:#0E7A5E;
+  --paper:#F5F6FA; --card:#FFFFFF; --line:#E3E5EF; --text:#14163F; --muted:#5D6088;
+  --live:#E5484D; --warn:#B4610A; --warnbg:#FDF2E3;
+  --sans:'Spline Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--text);font:15px/1.45 var(--sans)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--mint);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* top bar */
+header{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff}
+header .wrap{display:flex;align-items:center;gap:14px;min-height:60px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+header h1{font-size:16px;margin:0;font-weight:700}
+header h1 span{color:var(--mint)}
+.status{font:500 13px var(--mono);color:#C9CBE8;margin-left:auto}
+.status.bad{color:#FFB3B5}
+.status.dirty{color:#FFD58A}
+.hbtn{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;border-radius:9px;padding:8px 12px;font-weight:600;font-size:14px;text-decoration:none}
+.hbtn.primary{background:var(--mint);border-color:var(--mint);color:var(--ink)}
+.hbtn:disabled{opacity:.45;cursor:default}
+
+/* live control */
+.live{background:var(--ink);color:#fff;padding:18px 0 22px;border-bottom:4px solid var(--mint)}
+.live .wrap{display:grid;grid-template-columns:auto 1fr 1fr;gap:18px;align-items:stretch}
+@media (max-width:900px){.live .wrap{grid-template-columns:1fr}}
+.clock{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:170px}
+.clock b{font:600 44px/1 var(--mono);color:var(--mint);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.clock small{color:#9FA3D6;font-size:12px}
+.clock .pretend{display:flex;gap:6px;align-items:center;font-size:12px;color:#C9CBE8}
+.clock .pretend input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;padding:3px 6px;font:500 12px var(--mono)}
+.clock .pretend button{background:none;border:0;color:#9FA3D6;text-decoration:underline;font-size:12px;padding:0}
+.lcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.lcard small{font:600 12px var(--mono);color:#9FA3D6;text-transform:uppercase;letter-spacing:.04em}
+.lcard small.on{color:#FFB3B5}
+.lcard h2{font-size:19px;line-height:1.25;margin:0}
+.lcard .meta{font:500 13px var(--mono);color:#C9CBE8}
+.lcard .bar{height:6px;background:rgba(255,255,255,.14);border-radius:4px;overflow:hidden}
+.lcard .bar i{display:block;height:100%;background:var(--mint)}
+.lcard .go{margin-top:auto;align-self:flex-start;background:var(--mint);color:var(--ink);border:0;border-radius:11px;padding:12px 16px;font-weight:700;font-size:15px}
+.lcard .go.alt{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
+.lcard .go:disabled{opacity:.4;cursor:default}
+.opts{grid-column:1/-1;display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#C9CBE8}
+.opts label{display:inline-flex;gap:7px;align-items:center;cursor:pointer}
+.opts input{accent-color:var(--mint);width:16px;height:16px}
+.opts button{background:none;border:0;color:#C9CBE8;text-decoration:underline;padding:0;font-size:13px}
+
+/* agenda list */
+main{padding:22px 0 80px}
+.tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tools h2{margin:0 auto 0 0;font-size:20px}
+.tools button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;font-weight:600;font-size:13px}
+.tools button:hover{border-color:var(--mint)}
+.hint{color:var(--muted);font-size:13px;margin:0 0 14px}
+
+.row{display:grid;grid-template-columns:22px 96px 72px 64px 112px minmax(160px,2fr) minmax(130px,1.3fr) 160px;gap:6px 10px;align-items:start;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px;position:relative}
+.row.brk{background:#FBFBFD;border-style:dashed}
+.row.now{border:2px solid var(--mint);box-shadow:0 6px 20px rgba(15,15,70,.08)}
+.row.next{border-color:#B9BEE6}
+.row.past{opacity:.6}
+.row.dragging{opacity:.35}
+.row.drop-before::before,.row.drop-after::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--mint);border-radius:2px}
+.row.drop-before::before{top:-5px}.row.drop-after::after{bottom:-5px}
+.handle{grid-row:1/span 3;cursor:grab;color:#9FA3C9;font-size:18px;line-height:1;padding-top:22px;user-select:none;text-align:center}
+.handle:active{cursor:grabbing}
+.row .wide{grid-column:span 2}
+.row input,.row select,.row textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;min-width:0}
+.row input:focus,.row select:focus,.row textarea:focus{border-color:var(--mint);outline:none}
+.row input[type=time],.row input[type=number]{font:600 14px var(--mono);font-variant-numeric:tabular-nums}
+.row label.f{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+.row .endt{font:500 12px var(--mono);color:var(--muted);margin-top:4px}
+.row .title{font-weight:600}
+.row .more{grid-column:2/-1;display:none;grid-template-columns:1fr 2fr;gap:8px}
+.row.open .more{display:grid}
+.row .foot{grid-column:2/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row .side{display:flex;gap:6px;margin-left:auto}
+@media (max-width:900px){
+  .row{grid-template-columns:22px repeat(4,1fr)}
+  .row .c-title,.row .c-who,.row .c-act,.row .wide{grid-column:2/-1}
+}
+.ibtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:13px;font-weight:600;white-space:nowrap}
+.ibtn:hover{border-color:var(--mint)}
+.ibtn:disabled{opacity:.4;cursor:default}
+.ibtn.start{color:var(--mint-ink);border-color:#BFEBDD;background:#F0FBF7}
+.ibtn.del:hover{border-color:var(--live);color:var(--live)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:600 11px var(--mono);padding:2px 8px;border-radius:999px;background:#EEF0FA;color:var(--navy)}
+.chip.late{background:#FDECEC;color:#B4232A}
+.chip.warn{background:var(--warnbg);color:var(--warn)}
+.chip.co{background:transparent;color:var(--muted);padding-left:0}
+
+details.settings{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+details.settings summary{font-weight:700;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:14px}
+.grid label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.grid input{border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;
+  padding:11px 16px;font-size:14px;box-shadow:0 10px 30px rgba(15,15,70,.35);display:none;max-width:min(680px,92vw);z-index:40}
+.toast.on{display:block}
+.toast.bad{background:#7A1E22}
+.toast pre{margin:8px 0 0;font:12px var(--mono);white-space:pre-wrap;max-height:160px;overflow:auto;color:#C9CBE8}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1 id="eventName">Agenda <span>admin</span></h1>
+    <span class="status" id="status">Loading…</span>
+    <button class="hbtn" id="undo" type="button" title="Undo (⌘Z / Ctrl+Z)">Undo</button>
+    <button class="hbtn" id="redo" type="button" title="Redo (⇧⌘Z / Ctrl+Y)">Redo</button>
+    <a class="hbtn" id="preview" target="_blank" rel="noopener" title="Live page using this local agenda">Preview</a>
+    <button class="hbtn primary" id="publish" type="button" title="Commit and push agenda.json so the live page picks it up">Publish</button>
+  </div>
+</header>
+
+<section class="live" aria-label="Live control">
+  <div class="wrap">
+    <div class="clock">
+      <small id="tzLabel">Event time</small>
+      <b id="clock">--:--</b>
+      <div class="pretend">
+        <span>Pretend it's</span><input type="time" id="pretend" step="60" aria-label="Pretend the time is">
+        <button type="button" id="realTime" hidden>use real time</button>
+      </div>
+    </div>
+    <div class="lcard" id="nowCard">
+      <small id="nowLbl">Now</small>
+      <h2 id="nowTitle">—</h2>
+      <div class="meta" id="nowMeta"></div>
+      <div class="bar"><i id="nowBar" style="width:0"></i></div>
+      <button class="go alt" id="nowGo" type="button" disabled>Started late? Start it now</button>
+    </div>
+    <div class="lcard" id="nextCard">
+      <small>Next</small>
+      <h2 id="nextTitle">—</h2>
+      <div class="meta" id="nextMeta"></div>
+      <button class="go" id="nextGo" type="button" disabled>Start now</button>
+    </div>
+    <div class="opts">
+      <label><input type="checkbox" id="absorb"> Catch up: take a delay out of the next break (keeps at least 5 min)</label>
+      <label><input type="checkbox" id="autoPub" checked> Publish live-control changes right away</label>
+      <button type="button" id="clearDelays">Clear all delays</button>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div class="tools">
+      <h2>Sessions</h2>
+      <button type="button" data-add="talk">+ Talk</button>
+      <button type="button" data-add="coffee">+ Coffee break</button>
+      <button type="button" data-add="lunch">+ Lunch</button>
+      <button type="button" data-add="keynote">+ Keynote</button>
+    </div>
+    <p class="hint" id="hint">Drag ⠿ to reorder. Times re-flow automatically: each session follows the previous one, plus the changeover after a talk unless a break comes next. The changeover isn't shown on the public agenda. Changes save to agenda.json as you go; Publish pushes them live.</p>
+    <div id="list"></div>
+
+    <details class="settings">
+      <summary>Event settings and acts</summary>
+      <div class="grid" id="settings"></div>
+    </details>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ======================= state ======================= */
+const API = { "Content-Type": "application/json", "X-Agenda-Admin": "1" };
+const MIN_BREAK = 5;
+let A = null;                 // the agenda being edited
+let synced = "";              // the agenda as last read from or written to agenda.json (JSON text)
+let inFlight = false;         // a save request is on its way
+let undoStack = [], redoStack = [];
+let pending = [];             // labels of changes since the last publish
+let saveTimer = null, saving = Promise.resolve(), lastSaveError = null;
+let clockOffsetMs = 0;        // "pretend it's" offset from real time
+let publishing = false, lastPublished = null;
+const rowKeys = new WeakMap();   // session → key, so expanded rows stay open across re-renders
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const m = t => { const [h, n] = String(t).split(":").map(Number); return h * 60 + n; };
+const f = x => { x = ((Math.round(x) % 1440) + 1440) % 1440; return pad(Math.floor(x / 60)) + ":" + pad(x % 60); };
+const S = () => A.sessions;
+const CO = () => A.timing.changeoverMinutes ?? 0;
+const TALK_LEN = () => A.timing.talkMinutes + A.timing.qaMinutes;   // default length of a new talk
+// Q&A minutes of a talk: its own "qa" if set, else the default; the talk part is the rest of the slot.
+const qaOf = s => s.kind === "talk" ? Math.max(0, Math.min(s.dur, s.qa ?? A.timing.qaMinutes)) : 0;
+const end = s => m(s.start) + s.dur;
+// Changeover after a talk, unless a break follows (the break gives the next speaker time).
+const gapAfter = i => S()[i].kind === "talk" && S()[i + 1] && S()[i + 1].kind !== "break" ? CO() : 0;
+const label = s => s.title + (s.who && s.kind !== "break" ? ` — ${s.who}` : "");
+
+/* ======================= time model ======================= */
+// "Slack" is the delay a session carries beyond its normal slot (e.g. it started late).
+// Every edit keeps each session's slack, then re-flows the times, so delays survive unrelated edits.
+function slackOf(i) { return i ? Math.max(0, m(S()[i].start) - (end(S()[i - 1]) + gapAfter(i - 1))) : 0; }
+function slackMap() { const map = new Map(); S().forEach((s, i) => map.set(s, slackOf(i))); return map; }
+function reflow(sl, dayStart) {
+  S()[0].start = f(dayStart);
+  for (let i = 1; i < S().length; i++) S()[i].start = f(end(S()[i - 1]) + gapAfter(i - 1) + (sl.get(S()[i]) ?? 0));
+}
+
+// Every change goes through here: undo snapshot, mutate, re-flow, save, re-render.
+function edit(what, fn, { publish = false, rerender = true } = {}) {
+  undoStack.push(JSON.stringify(A)); if (undoStack.length > 200) undoStack.shift();
+  redoStack = [];
+  const sl = slackMap();
+  const r = fn(sl) || {};
+  if (r.cancel) { undoStack.pop(); return; }
+  if (!r.noReflow) reflow(sl, r.dayStart ?? m(S()[0].start));
+  pending.push(what);
+  scheduleSave(publish);
+  if (rerender) render(); else renderLive();
+}
+
+function startAt(i, T, { publish } = {}) {
+  const s = S()[i];
+  edit(`${s.title} starts at ${f(T)}`, sl => {
+    if (i === 0) return { dayStart: T };
+    const prev = S()[i - 1], oldStart = m(s.start);
+    const chain = end(prev) + gapAfter(i - 1);
+    if (T >= chain) sl.set(s, T - chain);
+    else { sl.set(s, 0); prev.dur = Math.max(1, T - gapAfter(i - 1) - m(prev.start)); } // previous one ended early
+    const delay = T - oldStart;
+    if ($("absorb").checked && delay > 0) {
+      const b = S().slice(i + 1).find(x => x.kind === "break");
+      if (b) b.dur -= Math.max(0, Math.min(delay, b.dur - MIN_BREAK));
+    }
+  }, { publish });
+}
+
+function assignAct(i) {
+  const s = S()[i];
+  if (s.kind !== "talk") { delete s.act; return; }
+  const before = S().slice(0, i).reverse().find(x => x.kind === "talk" && x.act);
+  const after = S().slice(i + 1).find(x => x.kind === "talk" && x.act);
+  s.act = (before || after)?.act ?? s.act ?? +Object.keys(A.acts)[0];
+}
+
+function move(from, to) {
+  if (from === to) return;
+  const s = S()[from];
+  edit(`Moved ${s.title}`, sl => {
+    S().splice(from, 1);
+    S().splice(to, 0, s);
+    sl.set(s, 0);
+    if (s.kind === "talk") assignAct(to);
+  });
+}
+
+/* ======================= persistence ======================= */
+function scheduleSave(publishAfter) {
+  clearTimeout(saveTimer);
+  setStatus();
+  saveTimer = setTimeout(() => { saveTimer = null; saving = save().then(ok => { if (ok && publishAfter && $("autoPub").checked) publish(); }); }, publishAfter ? 0 : 400);
+}
+async function save() {
+  inFlight = true;
+  try {
+    const body = JSON.stringify(A);
+    const r = await fetch("/api/agenda", { method: "PUT", headers: API, body });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+    synced = body;
+    lastSaveError = null; setStatus(); return true;
+  } catch (e) { lastSaveError = e.message; setStatus(); toast(`Couldn't save: ${e.message}`, true); return false; }
+  finally { inFlight = false; }
+}
+
+// Pick up changes made outside this page (another admin tab, a git pull, a hand edit), so a tab left
+// open never writes an old copy of the agenda back over newer changes. Skipped while you're editing here.
+async function syncFromDisk() {
+  if (!A || saveTimer || inFlight || publishing || document.activeElement?.matches?.("#list *, #settings *")) return;
+  try {
+    const r = await fetch("/api/agenda", { cache: "no-store" });
+    if (!r.ok) return;
+    const disk = await r.json();
+    disk.timing.changeoverMinutes ??= 0; disk.acts ??= {};
+    const text = JSON.stringify(disk);
+    if (text === synced || saveTimer || inFlight) return;
+    A = disk; synced = text;
+    undoStack = []; redoStack = [];   // older snapshots predate the outside change
+    render();
+    toast("Reloaded: agenda.json was changed outside this page.");
+  } catch (e) { /* server restarting: try again next time */ }
+}
+async function flush() {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; saving = save(); }
+  return saving;
+}
+async function publish() {
+  if (publishing) return;
+  publishing = true; setStatus();
+  try {
+    if (await flush() === false) throw new Error("save failed");
+    const msg = pending.length ? pending.slice(-4).join("; ") + (pending.length > 4 ? ` (+${pending.length - 4} more)` : "") : "update";
+    const r = await fetch("/api/publish", { method: "POST", headers: API, body: JSON.stringify({ message: msg }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+    pending = []; lastPublished = new Date();
+    toast("Published. The live page picks it up within about a minute (GitHub Pages deploy + 30 s refresh).");
+  } catch (e) {
+    toast(`Publish failed: ${e.message}`, true);
+  } finally { publishing = false; setStatus(); }
+}
+function setStatus() {
+  const st = $("status");
+  st.className = "status";
+  if (lastSaveError) { st.textContent = "Not saved: " + lastSaveError; st.classList.add("bad"); }
+  else if (publishing) st.textContent = "Publishing…";
+  else if (saveTimer) { st.textContent = "Saving…"; st.classList.add("dirty"); }
+  else if (pending.length) { st.textContent = `Saved locally · ${pending.length} unpublished change${pending.length > 1 ? "s" : ""}`; st.classList.add("dirty"); }
+  else st.textContent = lastPublished ? `Published ${lastPublished.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Saved · nothing to publish";
+  $("publish").disabled = publishing;
+  $("undo").disabled = !undoStack.length;
+  $("redo").disabled = !redoStack.length;
+}
+let toastTimer;
+function toast(text, bad = false) {
+  const t = $("toast");
+  t.textContent = text; t.classList.toggle("bad", bad); t.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("on"), bad ? 9000 : 4500);
+}
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(JSON.stringify(A)); A = JSON.parse(undoStack.pop());
+  pending.push("undo"); scheduleSave(); render();
+}
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(JSON.stringify(A)); A = JSON.parse(redoStack.pop());
+  pending.push("redo"); scheduleSave(); render();
+}
+
+/* ======================= clock ======================= */
+function eventNow() {
+  const d = new Date(Date.now() + clockOffsetMs);
+  const p = new Intl.DateTimeFormat("en-GB", { timeZone: A.event.timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(d);
+  const g = t => +p.find(x => x.type === t).value;
+  return { min: g("hour") * 60 + g("minute"), sec: g("second") };
+}
+
+/* ======================= rendering ======================= */
+function render() {
+  $("eventName").innerHTML = `${esc(A.event.name)} · <span>OnAir admin</span>`;
+  document.title = `Admin · ${A.event.name}`;
+  $("tzLabel").textContent = `${A.event.city} time (${A.event.timeZone})`;
+  const list = $("list");
+  const openRows = new Set([...list.querySelectorAll(".row.open")].map(r => r.dataset.key));
+  list.innerHTML = "";
+  const acts = Object.entries(A.acts);
+  S().forEach((s, i) => {
+    if (!rowKeys.has(s)) rowKeys.set(s, Math.random().toString(36).slice(2)); // stable key for UI state
+    const el = document.createElement("div");
+    el.className = "row" + (s.kind === "break" ? " brk" : "") + (openRows.has(rowKeys.get(s)) ? " open" : "");
+    el.dataset.i = i; el.dataset.key = rowKeys.get(s);
+    const slack = slackOf(i);
+    const chips = [];
+    if (slack) chips.push(`<span class="chip late">+${slack} min delay</span>`);
+    if (s.kind === "talk") chips.push(qaOf(s) >= s.dur
+      ? `<span class="chip warn">Q&amp;A fills the whole slot</span>`
+      : `<span class="chip">${s.dur - qaOf(s)} min talk + ${qaOf(s)} min Q&amp;A</span>`);
+    if (s.kind === "break" && !["Lunch", "Coffee break"].includes(s.title)) chips.push(`<span class="chip warn">Break title should be “Coffee break” or “Lunch”</span>`);
+    if (gapAfter(i)) chips.push(`<span class="chip co">then ${gapAfter(i)} min changeover</span>`);
+    el.innerHTML = `
+      <div class="handle" title="Drag to reorder" aria-hidden="true">⠿</div>
+      <div><label class="f">Start</label><input type="time" step="60" value="${s.start}" data-f="start" aria-label="Start time">
+        <div class="endt">ends ${f(end(s))}</div></div>
+      <div><label class="f">Minutes</label><input type="number" min="1" max="600" value="${s.dur}" data-f="dur" aria-label="Duration in minutes"></div>
+      <div>${s.kind === "talk" ? `<label class="f">Q&amp;A</label><input type="number" min="0" max="${s.dur}" value="${qaOf(s)}" data-f="qa" aria-label="Q&amp;A minutes at the end of the talk" title="Q&amp;A minutes at the end of this talk (default ${A.timing.qaMinutes})">` : ""}</div>
+      <div><label class="f">Type</label><select data-f="kind">
+        ${["talk", "break", "keynote"].map(k => `<option ${k === s.kind ? "selected" : ""}>${k}</option>`).join("")}</select></div>
+      <div class="c-title ${s.kind === "break" ? "wide" : ""}"><label class="f">Title</label><input class="title" value="${esc(s.title)}" data-f="title"></div>
+      ${s.kind !== "break" ? `<div class="c-who"><label class="f">Speaker</label><input value="${esc(s.who)}" data-f="who"></div>` : ""}
+      <div class="c-act">${s.kind === "talk" ? `<label class="f">${esc(A.labels?.act ?? "Act")}</label><select data-f="act">${acts.map(([k, v]) => `<option value="${k}" ${+k === +s.act ? "selected" : ""}>${k}. ${esc(v)}</option>`).join("")}</select>` : ""}</div>
+      <div class="more">
+        <div><label class="f">Role / team</label><input value="${esc(s.role)}" data-f="role"></div>
+        <div><label class="f">Description</label><textarea rows="2" data-f="desc">${esc(s.desc)}</textarea></div>
+      </div>
+      <div class="foot">
+        <div class="chips">${chips.join("")}</div>
+        <div class="side">
+          <button class="ibtn start" type="button" data-act="now" title="Set this session's start to the current time and shift everything after it">▶ Start now</button>
+          ${s.kind !== "break" ? `<button class="ibtn" type="button" data-act="more" title="Role and description">Details</button>` : ""}
+          <button class="ibtn" type="button" data-act="up" title="Move up" ${i ? "" : "disabled"}>↑</button>
+          <button class="ibtn" type="button" data-act="down" title="Move down" ${i < S().length - 1 ? "" : "disabled"}>↓</button>
+          <button class="ibtn del" type="button" data-act="del" title="Delete session">✕</button>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+  renderSettings();
+  renderLive();
+  setStatus();
+}
+
+function renderSettings() {
+  const g = $("settings");
+  if (g.contains(document.activeElement)) return; // don't clobber typing
+  const ev = A.event, t = A.timing;
+  g.innerHTML = `
+    <label>Event date<input type="date" data-s="event.date" value="${esc(ev.date)}"></label>
+    <label>UTC offset on that day<input data-s="event.utcOffset" value="${esc(ev.utcOffset)}" placeholder="+03:00"></label>
+    <label>Talk minutes<input type="number" min="1" data-s="timing.talkMinutes" value="${t.talkMinutes}"></label>
+    <label>Q&amp;A minutes<input type="number" min="0" data-s="timing.qaMinutes" value="${t.qaMinutes}"></label>
+    <label>Changeover after a talk (min)<input type="number" min="0" data-s="timing.changeoverMinutes" value="${t.changeoverMinutes ?? 0}"></label>
+    ${Object.entries(A.acts).map(([k, v]) => `<label>Act ${k}<input data-s="acts.${k}" value="${esc(v)}"></label>`).join("")}`;
+}
+
+function renderLive() {
+  const { min, sec } = eventNow();
+  $("clock").textContent = `${f(min)}:${pad(sec)}`;
+  const now = min + sec / 60;
+  const ci = S().findIndex(s => now >= m(s.start) && now < end(s));
+  const ni = S().findIndex(s => m(s.start) > now);
+  // Changeover / before start: nothing on stage, the next one is "up".
+  if (ci >= 0) {
+    const s = S()[ci];
+    $("nowLbl").textContent = s.kind === "break" ? "Break now" : "On stage now";
+    $("nowLbl").className = "on";
+    $("nowTitle").textContent = label(s);
+    $("nowMeta").textContent = `${s.start}–${f(end(s))} · ${Math.max(1, Math.ceil(end(s) - now))} min left`;
+    $("nowBar").style.width = ((now - m(s.start)) / s.dur * 100).toFixed(1) + "%";
+    $("nowGo").disabled = false; $("nowGo").dataset.i = ci;
+    $("nowGo").textContent = `Started late? Start it now (${f(min)})`;
+  } else {
+    const between = ni > 0;
+    $("nowLbl").textContent = ni === 0 ? "Before start" : ni < 0 ? "After the close" : "Changeover";
+    $("nowLbl").className = "";
+    $("nowTitle").textContent = between ? "Next speaker getting ready" : ni === 0 ? "Doors open soon" : "That's a wrap";
+    $("nowMeta").textContent = ni >= 0 ? `${label(S()[ni])} at ${S()[ni].start}` : "";
+    $("nowBar").style.width = "0";
+    $("nowGo").disabled = true; $("nowGo").textContent = "Started late? Start it now";
+  }
+  const n = ni >= 0 ? S()[ni] : null;
+  $("nextTitle").textContent = n ? label(n) : "—";
+  const diff = n ? Math.ceil(m(n.start) - now) : 0;
+  $("nextMeta").textContent = n ? `Scheduled ${n.start} · in ${diff} min` : "Nothing else today";
+  $("nextGo").disabled = !n; $("nextGo").dataset.i = ni;
+  $("nextGo").textContent = n ? `Start “${n.title.length > 28 ? n.title.slice(0, 27) + "…" : n.title}” now (${f(min)})` : "Start now";
+  document.querySelectorAll("#list .row").forEach(r => {
+    const i = +r.dataset.i;
+    r.classList.toggle("now", i === ci);
+    r.classList.toggle("next", i === ni);
+    r.classList.toggle("past", now >= end(S()[i]));
+  });
+  $("preview").href = "/";
+}
+
+/* ======================= events ======================= */
+const list = $("list");
+const rowIndex = el => +el.closest(".row").dataset.i;
+
+list.addEventListener("change", e => {
+  const fld = e.target.dataset.f; if (!fld) return;
+  const i = rowIndex(e.target), s = S()[i], v = e.target.value;
+  if (fld === "start") { if (v) startAt(i, m(v)); return; }
+  if (fld === "dur") {
+    const d = Math.max(1, Math.round(+v || 1));
+    edit(`${s.title}: ${d} min`, () => { s.dur = d; });
+    return;
+  }
+  if (fld === "qa") {
+    const qa = Math.max(0, Math.min(s.dur, Math.round(+v || 0)));
+    // Store it only when it differs from the default, so changing the default still applies to the rest.
+    edit(`${s.title}: ${qa} min Q&A`, () => { if (qa === A.timing.qaMinutes) delete s.qa; else s.qa = qa; return { noReflow: true }; });
+    return;
+  }
+  if (fld === "kind") {
+    edit(`${s.title}: now a ${v}`, () => {
+      s.kind = v;
+      if (v === "break") { if (!["Lunch", "Coffee break"].includes(s.title)) s.title = "Coffee break"; delete s.who; delete s.role; delete s.desc; delete s.act; }
+      if (v === "talk") { s.dur = TALK_LEN(); assignAct(i); }
+      if (v === "keynote") delete s.act;
+    });
+    return;
+  }
+  if (fld === "act") { edit(`${s.title}: act ${v}`, () => { s.act = +v; }, { rerender: false }); return; }
+  // Text fields don't move anything in time.
+  edit(`${s.title}: ${fld}`, () => { s[fld] = v; return { noReflow: true }; }, { rerender: fld === "title" });
+});
+
+list.addEventListener("click", e => {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const i = rowIndex(b), s = S()[i];
+  if (b.dataset.act === "now") startAt(i, eventNow().min);
+  else if (b.dataset.act === "more") b.closest(".row").classList.toggle("open");
+  else if (b.dataset.act === "up") move(i, i - 1);
+  else if (b.dataset.act === "down") move(i, i + 1);
+  else if (b.dataset.act === "del" && confirm(`Delete “${s.title}”?`)) edit(`Deleted ${s.title}`, () => { S().splice(i, 1); });
+});
+
+// Drag and drop. Rows only become draggable while the handle is held, so text in inputs stays selectable.
+let dragFrom = null;
+list.addEventListener("pointerdown", e => { const h = e.target.closest(".handle"); if (h) h.closest(".row").draggable = true; });
+list.addEventListener("dragstart", e => {
+  const row = e.target.closest(".row"); if (!row) return;
+  dragFrom = +row.dataset.i; row.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(dragFrom));
+});
+const clearDrop = () => list.querySelectorAll(".drop-before,.drop-after").forEach(r => r.classList.remove("drop-before", "drop-after"));
+list.addEventListener("dragover", e => {
+  if (dragFrom === null) return;
+  const row = e.target.closest(".row"); if (!row) return;
+  e.preventDefault();
+  const r = row.getBoundingClientRect(), after = e.clientY > r.top + r.height / 2;
+  clearDrop(); row.classList.add(after ? "drop-after" : "drop-before");
+});
+list.addEventListener("drop", e => {
+  const row = e.target.closest(".row"); if (dragFrom === null || !row) return;
+  e.preventDefault();
+  let to = +row.dataset.i + (row.classList.contains("drop-after") ? 1 : 0);
+  if (to > dragFrom) to--;
+  const from = dragFrom; dragFrom = null; clearDrop();
+  move(from, to);
+});
+list.addEventListener("dragend", e => {
+  dragFrom = null; clearDrop();
+  list.querySelectorAll(".row").forEach(r => { r.classList.remove("dragging"); r.draggable = false; });
+});
+
+document.querySelector(".tools").addEventListener("click", e => {
+  const k = e.target.dataset.add; if (!k) return;
+  const tpl = {
+    talk: { kind: "talk", dur: TALK_LEN(), title: "New talk", who: "", role: "", desc: "" },
+    coffee: { kind: "break", dur: 10, title: "Coffee break" },
+    lunch: { kind: "break", dur: 60, title: "Lunch" },
+    keynote: { kind: "keynote", dur: 10, title: "Keynote", who: "", role: "" },
+  }[k];
+  edit(`Added ${tpl.title}`, () => {
+    S().push({ start: "00:00", ...tpl });
+    if (tpl.kind === "talk") assignAct(S().length - 1);
+  });
+  list.lastElementChild?.scrollIntoView({ block: "center", behavior: "smooth" });
+  list.lastElementChild?.querySelector(".title")?.select();
+});
+
+$("settings").addEventListener("change", e => {
+  const path = e.target.dataset.s; if (!path) return;
+  const [obj, key] = path.split(".");
+  const v = e.target.type === "number" ? Math.max(0, +e.target.value || 0) : e.target.value;
+  edit(`Set ${path}`, () => {
+    if (obj === "acts") A.acts[key] = v;
+    else A[obj][key] = v;
+  });
+});
+
+$("nowGo").addEventListener("click", e => startAt(+e.currentTarget.dataset.i, eventNow().min, { publish: true }));
+$("nextGo").addEventListener("click", e => startAt(+e.currentTarget.dataset.i, eventNow().min, { publish: true }));
+$("clearDelays").addEventListener("click", () => {
+  if (!S().some((_, i) => slackOf(i))) return toast("No delays to clear.");
+  if (confirm("Remove every delay and snap all sessions back to back (plus changeovers)?"))
+    edit("Cleared delays", sl => { sl.forEach((_, k) => sl.set(k, 0)); });
+});
+$("publish").addEventListener("click", publish);
+$("undo").addEventListener("click", undo);
+$("redo").addEventListener("click", redo);
+addEventListener("keydown", e => {
+  if (!(e.metaKey || e.ctrlKey) || e.target.closest("input,textarea")) return;
+  if (e.key.toLowerCase() === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
+  else if ((e.key.toLowerCase() === "z" && e.shiftKey) || e.key.toLowerCase() === "y") { e.preventDefault(); redo(); }
+});
+
+$("pretend").addEventListener("change", e => {
+  if (!e.target.value) { clockOffsetMs = 0; $("realTime").hidden = true; return renderLive(); }
+  clockOffsetMs = 0;
+  const { min, sec } = eventNow();
+  clockOffsetMs = ((m(e.target.value) - min) * 60 - sec) * 1000;
+  $("realTime").hidden = false; renderLive();
+});
+$("realTime").addEventListener("click", () => { clockOffsetMs = 0; $("pretend").value = ""; $("realTime").hidden = true; renderLive(); });
+
+addEventListener("beforeunload", e => { if (saveTimer || pending.length) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ======================= boot ======================= */
+(async () => {
+  try {
+    const r = await fetch("/api/agenda", { cache: "no-store" });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    A = await r.json();
+  } catch (e) {
+    $("status").textContent = "Can't reach the OnAir server. Start it with: node admin/server.mjs";
+    $("status").classList.add("bad");
+    return;
+  }
+  A.timing.changeoverMinutes ??= 0; A.acts ??= {};
+  synced = JSON.stringify(A);
+  render();
+  setInterval(renderLive, 1000);
+  setInterval(syncFromDisk, 3000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) syncFromDisk(); });
+})();
+</script>
+</body>
+</html>

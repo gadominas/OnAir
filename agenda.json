@@ -1,0 +1,152 @@
+{
+  "event": {
+    "name": "OnAir Demo Day 2027",
+    "brand": {
+      "title": "OnAir",
+      "number": "Demo"
+    },
+    "city": "Lisbon",
+    "date": "2027-05-20",
+    "timeZone": "Europe/Lisbon",
+    "utcOffset": "+01:00",
+    "timeZoneNote": "Lisbon time (WEST, UTC+1)",
+    "venue": "Example Hall, Rua do Exemplo 42, Lisbon.",
+    "dateText": "Thursday 20 May 2027",
+    "organizer": "Your Organisation"
+  },
+  "links": {
+    "qa": "",
+    "wall": "",
+    "stream": ""
+  },
+  "theme": {
+    "ink": "#0F0F46",
+    "navy": "#2A2A72",
+    "accent": "#3ACEA9",
+    "accentInk": "#0E7A5E"
+  },
+  "labels": {
+    "act": "Act"
+  },
+  "cli": {
+    "command": "onair --city",
+    "guesses": [
+      "porto",
+      "madrid",
+      "paris"
+    ],
+    "jokes": true,
+    "exitCode": 0
+  },
+  "timing": {
+    "talkMinutes": 35,
+    "qaMinutes": 7,
+    "changeoverMinutes": 5
+  },
+  "acts": {
+    "1": "Faster, smaller, clearer",
+    "2": "Shipping it",
+    "3": "Keeping it running"
+  },
+  "sessions": [
+    {
+      "start": "09:00",
+      "dur": 10,
+      "kind": "keynote",
+      "title": "Opening",
+      "who": "Rita Moreno-Lind",
+      "role": "Host"
+    },
+    {
+      "start": "09:10",
+      "dur": 42,
+      "kind": "talk",
+      "act": 1,
+      "title": "The Latency Budget",
+      "who": "Tomas Varga",
+      "role": "Platform Engineer",
+      "desc": "Where the milliseconds in a user request actually go, and the three changes that bought back half of them."
+    },
+    {
+      "start": "09:57",
+      "dur": 42,
+      "kind": "talk",
+      "act": 1,
+      "title": "Docs That Write Back",
+      "who": "Aiko Brandt",
+      "role": "Developer Experience",
+      "desc": "Treating documentation as a product: feedback loops, ownership, and why the best docs are the ones that tell you they are wrong."
+    },
+    {
+      "start": "10:39",
+      "dur": 10,
+      "kind": "break",
+      "title": "Coffee break"
+    },
+    {
+      "start": "10:49",
+      "dur": 42,
+      "kind": "talk",
+      "act": 2,
+      "title": "Small Models, Big Wins",
+      "who": "Leo Okafor",
+      "role": "ML Engineer",
+      "desc": "Shipping compact models to the edge: the trade-offs, the tooling, and a live demo on a laptop older than the speaker’s coffee mug."
+    },
+    {
+      "start": "11:36",
+      "dur": 42,
+      "kind": "talk",
+      "act": 2,
+      "title": "Postmortems Without the Blame",
+      "who": "Hana Sato",
+      "role": "Incident Manager",
+      "desc": "Running incident reviews people actually want to attend, with a template you can steal on the way out."
+    },
+    {
+      "start": "12:23",
+      "dur": 20,
+      "kind": "talk",
+      "act": 2,
+      "title": "Lightning: Feature Flags Gone Wild",
+      "who": "Priya Sandoval",
+      "role": "Release Engineering",
+      "desc": "A short cautionary tale of 1,200 feature flags and how a team cleaned them up in a week.",
+      "qa": 5
+    },
+    {
+      "start": "12:43",
+      "dur": 60,
+      "kind": "break",
+      "title": "Lunch"
+    },
+    {
+      "start": "13:43",
+      "dur": 42,
+      "kind": "talk",
+      "act": 3,
+      "title": "Testing in Production, Responsibly",
+      "who": "Noor Haddad",
+      "role": "SRE Lead",
+      "desc": "Canaries, shadow traffic and kill switches: how to learn from real traffic without learning the hard way."
+    },
+    {
+      "start": "14:30",
+      "dur": 42,
+      "kind": "talk",
+      "act": 3,
+      "title": "The Boring Architecture Manifesto",
+      "who": "Felix Aaltonen",
+      "role": "Principal Engineer",
+      "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
+    },
+    {
+      "start": "15:17",
+      "dur": 10,
+      "kind": "keynote",
+      "title": "Closing notes",
+      "who": "Rita Moreno-Lind",
+      "role": "Host"
+    }
+  ]
+}
