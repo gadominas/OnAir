@@ -139,13 +139,14 @@
     },
     {
       "start": "14:32",
-      "dur": 47,
+      "dur": 57,
       "kind": "talk",
       "act": 2,
       "title": "The Boring Architecture Manifesto",
       "who": "Felix Aaltonen",
       "role": "Principal Engineer",
-      "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product."
+      "desc": "A deliberately unexciting talk about choosing well-understood technology and spending the saved energy on the product.",
+      "qa": 12
     }
   ]
 }
